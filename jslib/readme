@@ -1,0 +1,3 @@
+Javascript library files for definitions in ../definitions, which
+require javascript libraries. i.e. here you can't find webrtc.js
+because it's browser built-in functionality.
