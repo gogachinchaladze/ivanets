@@ -213,6 +213,7 @@ declare class b2FixtureDef
     shape:any
     density:number
     friction:number
+    restitution:number
 }
 
 //Joint definitions

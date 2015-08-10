@@ -2,6 +2,8 @@
 ///<reference path="../src/DeltaTime.ts" />
 ///<reference path="../src/GameClassThreeJS.ts"/>
 ///<reference path="../src/ThreeJSHelpers.ts"/>
+///<reference path="../src/LiquidFunHelpers.ts" />
+
 
 var animationsManager = new Ivane.Animation.AnimationsManager(32)
 
@@ -19,6 +21,7 @@ animationsManager.queueAnimation(1,100,2,
 
 
 var dt:number = 0.0	
+//var world:b2World
 	
 window.onload = (e:Event) => {
 
@@ -146,9 +149,70 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		mesh.position.set(-2,-2,0)
 	}
 	
+	lfWorld:b2World
+	
+	private test_liquidfun()
+	{
+		var physlogDiv = <HTMLDivElement>document.getElementById("physlog")
+		
+		this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(new b2Vec2(0,-9))
+		
+		console.log(this.lfWorld)
+		
+		var circleShape = new b2CircleShape()
+		circleShape.radius = 1
+		
+		var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(
+			this.lfWorld,
+			circleShape,
+			1,1,new b2Vec2(0,2),
+			2,1,false,false,
+			1)
+			
+		var boxShape = new b2PolygonShape()
+		boxShape.SetAsBoxXY(10,1)
+		
+		var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(
+			this.lfWorld,
+			boxShape,
+			1,
+			new b2Vec2(-5,-2),
+			1,
+			1,
+			true,
+			false,
+			0)
+			
+		var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld,
+			boxShape,
+			1,
+			new b2Vec2(5,-2),
+			0)
+			
+		
+		
+		var timeStep = 1.0 / 60.0;
+		var velocityIterations = 6
+		var positionIterations = 2
+
+		var animatePhysics = ()=>{
+			this.lfWorld.Step(timeStep, velocityIterations, positionIterations);
+			
+			
+			physlogDiv.innerHTML = "x:"+ this.lfWorld.bodies[0].GetPosition().x
+			+"<br/> y: " + this.lfWorld.bodies[0].GetPosition().y
+			
+			
+			requestAnimationFrame(animatePhysics)
+		}	
+		
+		animatePhysics()
+	}
+	
 	runtTests()
 	{
 		this.test_mergeGeometry()
+		this.test_liquidfun()
 	}
 }
 

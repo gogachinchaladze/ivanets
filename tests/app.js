@@ -546,10 +546,74 @@ var mc = (function (_super) {
     };
     return mc;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
+/// <reference path="../definitions/liquidfun/liquidfun.d.ts" />
+/// <reference path="Exceptions.ts" />
+var Ivane;
+(function (Ivane) {
+    var LiquidFunHelpers;
+    (function (LiquidFunHelpers) {
+        function createWorldAndRegisterItAsGlobalVariable(gravity) {
+            var world = new b2World(gravity);
+            window["world"] = world;
+            return world;
+        }
+        LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable = createWorldAndRegisterItAsGlobalVariable;
+        function createDynamicBody(world_ref, shape, density, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution) {
+            var bodyDefinition = new b2BodyDef();
+            bodyDefinition.active = true;
+            bodyDefinition.position = position;
+            bodyDefinition.angularDamping = angularDamping;
+            bodyDefinition.linearDamping = linearDamping;
+            bodyDefinition.bullet = bullet;
+            bodyDefinition.type = b2_dynamicBody;
+            var dynamicBody = world_ref.CreateBody(bodyDefinition);
+            var bodyFixtureDefinition = new b2FixtureDef();
+            bodyFixtureDefinition.density = density;
+            bodyFixtureDefinition.friction = friction;
+            bodyFixtureDefinition.shape = shape;
+            bodyFixtureDefinition.restitution = restitution;
+            dynamicBody.CreateFixtureFromDef(bodyFixtureDefinition);
+            return dynamicBody;
+        }
+        LiquidFunHelpers.createDynamicBody = createDynamicBody;
+        function createKinematicBody(world_ref, shape, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution) {
+            var bodyDefinition = new b2BodyDef();
+            bodyDefinition.active = true;
+            bodyDefinition.position = position;
+            bodyDefinition.angularDamping = angularDamping;
+            bodyDefinition.linearDamping;
+            bodyDefinition.bullet = bullet;
+            bodyDefinition.type = b2_kinematicBody;
+            var kinematicBody = world_ref.CreateBody(bodyDefinition);
+            var bodyFixtureDefinition = new b2FixtureDef();
+            bodyFixtureDefinition.friction = friction;
+            bodyFixtureDefinition.shape = shape;
+            bodyFixtureDefinition.restitution = restitution;
+            kinematicBody.CreateFixtureFromDef(bodyFixtureDefinition);
+            return kinematicBody;
+        }
+        LiquidFunHelpers.createKinematicBody = createKinematicBody;
+        function createStaticBody(world_ref, shape, friction, position, restitution) {
+            var bodyDefinition = new b2BodyDef();
+            bodyDefinition.active = true;
+            bodyDefinition.position = position;
+            bodyDefinition.type = b2_staticBody;
+            var staticBody = world_ref.CreateBody(bodyDefinition);
+            var bodyFixtureDefinition = new b2FixtureDef();
+            bodyFixtureDefinition.friction = friction;
+            bodyFixtureDefinition.shape = shape;
+            bodyFixtureDefinition.restitution = restitution;
+            staticBody.CreateFixtureFromDef(bodyFixtureDefinition);
+            return staticBody;
+        }
+        LiquidFunHelpers.createStaticBody = createStaticBody;
+    })(LiquidFunHelpers = Ivane.LiquidFunHelpers || (Ivane.LiquidFunHelpers = {}));
+})(Ivane || (Ivane = {}));
 ///<reference path="../src/AnimationsManager.ts"/>
 ///<reference path="../src/DeltaTime.ts" />
 ///<reference path="../src/GameClassThreeJS.ts"/>
 ///<reference path="../src/ThreeJSHelpers.ts"/>
+///<reference path="../src/LiquidFunHelpers.ts" />
 var animationsManager = new Ivane.Animation.AnimationsManager(32);
 animationsManager.queueAnimation(1, 100, 2, Ivane.Animation.EASING_TYPES.EASE_IN_EASE_OUT, function (animation) {
     console.log(animation.getProgress());
@@ -558,6 +622,7 @@ animationsManager.queueAnimation(1, 100, 2, Ivane.Animation.EASING_TYPES.EASE_IN
     console.log("animation finished");
 });
 var dt = 0.0;
+//var world:b2World
 window.onload = function (e) {
     test_GameClassThreeJS();
 };
@@ -630,8 +695,32 @@ var GClass = (function (_super) {
         mesh.position.x = -2;
         mesh.position.set(-2, -2, 0);
     };
+    GClass.prototype.test_liquidfun = function () {
+        var _this = this;
+        var physlogDiv = document.getElementById("physlog");
+        this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(new b2Vec2(0, -9));
+        console.log(this.lfWorld);
+        var circleShape = new b2CircleShape();
+        circleShape.radius = 1;
+        var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(0, 2), 2, 1, false, false, 1);
+        var boxShape = new b2PolygonShape();
+        boxShape.SetAsBoxXY(10, 1);
+        var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, 1, new b2Vec2(-5, -2), 1, 1, true, false, 0);
+        var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld, boxShape, 1, new b2Vec2(5, -2), 0);
+        var timeStep = 1.0 / 60.0;
+        var velocityIterations = 6;
+        var positionIterations = 2;
+        var animatePhysics = function () {
+            _this.lfWorld.Step(timeStep, velocityIterations, positionIterations);
+            physlogDiv.innerHTML = "x:" + _this.lfWorld.bodies[0].GetPosition().x
+                + "<br/> y: " + _this.lfWorld.bodies[0].GetPosition().y;
+            requestAnimationFrame(animatePhysics);
+        };
+        animatePhysics();
+    };
     GClass.prototype.runtTests = function () {
         this.test_mergeGeometry();
+        this.test_liquidfun();
     };
     return GClass;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
