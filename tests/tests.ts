@@ -4,9 +4,7 @@
 ///<reference path="../src/ThreeJSHelpers.ts"/>
 ///<reference path="../src/LiquidFunHelpers.ts" />
 
-
 var animationsManager = new Ivane.Animation.AnimationsManager(32)
-
 
 animationsManager.queueAnimation(1,100,2,
 	Ivane.Animation.EASING_TYPES.EASE_IN_EASE_OUT,
@@ -19,12 +17,10 @@ animationsManager.queueAnimation(1,100,2,
 	})
 	
 
-
 var dt:number = 0.0	
 //var world:b2World
 	
 window.onload = (e:Event) => {
-
 	test_GameClassThreeJS()	
 }	
 
@@ -154,21 +150,24 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 	private test_liquidfun()
 	{
 		var physlogDiv = <HTMLDivElement>document.getElementById("physlog")
+		var connectedBodiesDiv = <HTMLDivElement>document.getElementById("connectedbodies")
 		
 		this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(new b2Vec2(0,-9))
 		
 		console.log(this.lfWorld)
 		
+		//Testing dynamic body creation
 		var circleShape = new b2CircleShape()
 		circleShape.radius = 1
 		
 		var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(
 			this.lfWorld,
 			circleShape,
-			1,1,new b2Vec2(0,2),
-			2,1,false,false,
-			1)
+			1, 1, new b2Vec2(0,2),
+			2, 1, false, false,
+			1, null)
 			
+		//Testing kinematic body creation
 		var boxShape = new b2PolygonShape()
 		boxShape.SetAsBoxXY(10,1)
 		
@@ -177,18 +176,48 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			boxShape,
 			1,
 			new b2Vec2(-5,-2),
-			1,
-			1,
-			true,
-			false,
-			0)
+			1, 1, true, false,
+			0, null)
 			
-		var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld,
+		//Testing static body creation function
+		var staticBody = Ivane.LiquidFunHelpers.createStaticBody(
+			this.lfWorld,
 			boxShape,
 			1,
 			new b2Vec2(5,-2),
-			0)
+			0, null)
+		
+		//Testing disntace joint	
+		boxShape.SetAsBoxXY(.5,.5)
+		
+		var CONNECTED_BODY = 1
 			
+		var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(
+			this.lfWorld,
+			circleShape,
+			1, 1, new b2Vec2(5,2),
+			2, 1, false, false,
+			1, CONNECTED_BODY)
+			
+		var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(
+			this.lfWorld,
+			circleShape,
+			1, 1, new b2Vec2(8,2),
+			2, 1, false, false,
+			1, CONNECTED_BODY)
+		
+		
+	
+		var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(
+			this.lfWorld,
+			dynamicBodyA,
+			dynamicBodyB,
+			new b2Vec2(0,0),
+			new b2Vec2(-1,0),
+			3,
+			2,
+			4
+		)
 		
 		
 		var timeStep = 1.0 / 60.0;
@@ -198,10 +227,27 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		var animatePhysics = ()=>{
 			this.lfWorld.Step(timeStep, velocityIterations, positionIterations);
 			
+			physlogDiv.innerHTML = "x:" + this.lfWorld.bodies[0].GetPosition().x
+			+ "<br/> y: " + this.lfWorld.bodies[0].GetPosition().y
 			
-			physlogDiv.innerHTML = "x:"+ this.lfWorld.bodies[0].GetPosition().x
-			+"<br/> y: " + this.lfWorld.bodies[0].GetPosition().y
+			var connectedBodies = new Array<b2Body>()
 			
+			for(var bodyIndex = 0; bodyIndex < this.lfWorld.bodies.length; bodyIndex++)
+			{
+				var connectedBody = this.lfWorld.bodies[bodyIndex]
+								
+				if(connectedBody.GetUserData() == CONNECTED_BODY)
+				{
+					connectedBodies.push(connectedBody)
+				}
+			}
+			
+			connectedBodiesDiv.innerHTML = 
+			"bodyA <br/>x: " + connectedBodies[0].GetPosition().x
+			+ "<br/>y: " + connectedBodies[0].GetPosition().y
+			+ "<br/>bodyB <br/>x: " + connectedBodies[1].GetPosition().x
+			+ "<br/>y: " + connectedBodies[1].GetPosition().y
+			+ "<br/>distance: " + Math.abs(connectedBodies[0].GetPosition().x - connectedBodies[1].GetPosition().x)
 			
 			requestAnimationFrame(animatePhysics)
 		}	

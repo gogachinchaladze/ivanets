@@ -24,7 +24,7 @@ declare class b2BodyDef
     fixedRotation:boolean
     bullet:boolean
     active:boolean
-    userData:any
+    userData:number
     filter:b2Filter
 }
 
@@ -116,13 +116,13 @@ declare class b2Body
     GetPositionY():number;
     SetTransform(position:b2Vec2,angle:number):void;
 
-
     SetLinearVelocity(v:b2Vec2):void;
     GetLinearVelocity():b2Vec2;
 
-
     SetAngularVelocity(omega:number):void;
     GetAngularVelocity():number;
+    
+    GetUserData():number;
 }
 
 interface b2QueryCallback
@@ -201,7 +201,7 @@ declare class b2Transform
 
 declare class b2PolygonShape extends b2Shape
 {
-    SetAsBoxXY(x:number,y:number);
+    SetAsBoxXY(halfWidth:number,halfHeight:number);
 }
 
 declare var b2_dynamicBody:any
@@ -269,6 +269,11 @@ declare class b2GearJointDef extends  b2JointDef
 declare class b2Joint
 {
 
+}
+
+declare class b2DistanceJoint extends b2Joint
+{
+    
 }
 
 declare class b2RevoluteJoin extends b2Joint

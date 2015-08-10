@@ -558,7 +558,21 @@ var Ivane;
             return world;
         }
         LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable = createWorldAndRegisterItAsGlobalVariable;
-        function createDynamicBody(world_ref, shape, density, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution) {
+        function createDistanceJoint(world_ref, bodyA, bodyB, anchorA, anchorB, length, dampingRatio, //1 is recomended
+            frequencyHz //4 is recomended
+            ) {
+            var distanceJointDef = new b2DistanceJointDef();
+            distanceJointDef.length = length;
+            distanceJointDef.dampingRatio = dampingRatio;
+            distanceJointDef.frequencyHz = frequencyHz;
+            distanceJointDef.InitializeAndCreate(bodyA, bodyB, anchorA, anchorB);
+            distanceJointDef.localAnchorA.Set(anchorA.x, anchorA.y);
+            distanceJointDef.localAnchorB.Set(anchorB.x, anchorB.y);
+            var distanceJoint = world_ref.CreateJoint(distanceJointDef);
+            return distanceJoint;
+        }
+        LiquidFunHelpers.createDistanceJoint = createDistanceJoint;
+        function createDynamicBody(world_ref, shape, density, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution, userData) {
             var bodyDefinition = new b2BodyDef();
             bodyDefinition.active = true;
             bodyDefinition.position = position;
@@ -566,6 +580,7 @@ var Ivane;
             bodyDefinition.linearDamping = linearDamping;
             bodyDefinition.bullet = bullet;
             bodyDefinition.type = b2_dynamicBody;
+            bodyDefinition.userData = userData;
             var dynamicBody = world_ref.CreateBody(bodyDefinition);
             var bodyFixtureDefinition = new b2FixtureDef();
             bodyFixtureDefinition.density = density;
@@ -576,7 +591,7 @@ var Ivane;
             return dynamicBody;
         }
         LiquidFunHelpers.createDynamicBody = createDynamicBody;
-        function createKinematicBody(world_ref, shape, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution) {
+        function createKinematicBody(world_ref, shape, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution, userData) {
             var bodyDefinition = new b2BodyDef();
             bodyDefinition.active = true;
             bodyDefinition.position = position;
@@ -584,6 +599,7 @@ var Ivane;
             bodyDefinition.linearDamping;
             bodyDefinition.bullet = bullet;
             bodyDefinition.type = b2_kinematicBody;
+            bodyDefinition.userData = userData;
             var kinematicBody = world_ref.CreateBody(bodyDefinition);
             var bodyFixtureDefinition = new b2FixtureDef();
             bodyFixtureDefinition.friction = friction;
@@ -593,11 +609,12 @@ var Ivane;
             return kinematicBody;
         }
         LiquidFunHelpers.createKinematicBody = createKinematicBody;
-        function createStaticBody(world_ref, shape, friction, position, restitution) {
+        function createStaticBody(world_ref, shape, friction, position, restitution, userData) {
             var bodyDefinition = new b2BodyDef();
             bodyDefinition.active = true;
             bodyDefinition.position = position;
             bodyDefinition.type = b2_staticBody;
+            bodyDefinition.userData = userData;
             var staticBody = world_ref.CreateBody(bodyDefinition);
             var bodyFixtureDefinition = new b2FixtureDef();
             bodyFixtureDefinition.friction = friction;
@@ -698,15 +715,25 @@ var GClass = (function (_super) {
     GClass.prototype.test_liquidfun = function () {
         var _this = this;
         var physlogDiv = document.getElementById("physlog");
+        var connectedBodiesDiv = document.getElementById("connectedbodies");
         this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(new b2Vec2(0, -9));
         console.log(this.lfWorld);
+        //Testing dynamic body creation
         var circleShape = new b2CircleShape();
         circleShape.radius = 1;
-        var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(0, 2), 2, 1, false, false, 1);
+        var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(0, 2), 2, 1, false, false, 1, null);
+        //Testing kinematic body creation
         var boxShape = new b2PolygonShape();
         boxShape.SetAsBoxXY(10, 1);
-        var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, 1, new b2Vec2(-5, -2), 1, 1, true, false, 0);
-        var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld, boxShape, 1, new b2Vec2(5, -2), 0);
+        var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, 1, new b2Vec2(-5, -2), 1, 1, true, false, 0, null);
+        //Testing static body creation function
+        var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld, boxShape, 1, new b2Vec2(5, -2), 0, null);
+        //Testing disntace joint	
+        boxShape.SetAsBoxXY(.5, .5);
+        var CONNECTED_BODY = 1;
+        var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5, 2), 2, 1, false, false, 1, CONNECTED_BODY);
+        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(8, 2), 2, 1, false, false, 1, CONNECTED_BODY);
+        var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, dynamicBodyA, dynamicBodyB, new b2Vec2(0, 0), new b2Vec2(-1, 0), 3, 2, 4);
         var timeStep = 1.0 / 60.0;
         var velocityIterations = 6;
         var positionIterations = 2;
@@ -714,6 +741,19 @@ var GClass = (function (_super) {
             _this.lfWorld.Step(timeStep, velocityIterations, positionIterations);
             physlogDiv.innerHTML = "x:" + _this.lfWorld.bodies[0].GetPosition().x
                 + "<br/> y: " + _this.lfWorld.bodies[0].GetPosition().y;
+            var connectedBodies = new Array();
+            for (var bodyIndex = 0; bodyIndex < _this.lfWorld.bodies.length; bodyIndex++) {
+                var connectedBody = _this.lfWorld.bodies[bodyIndex];
+                if (connectedBody.GetUserData() == CONNECTED_BODY) {
+                    connectedBodies.push(connectedBody);
+                }
+            }
+            connectedBodiesDiv.innerHTML =
+                "bodyA <br/>x: " + connectedBodies[0].GetPosition().x
+                    + "<br/>y: " + connectedBodies[0].GetPosition().y
+                    + "<br/>bodyB <br/>x: " + connectedBodies[1].GetPosition().x
+                    + "<br/>y: " + connectedBodies[1].GetPosition().y
+                    + "<br/>distance: " + Math.abs(connectedBodies[0].GetPosition().x - connectedBodies[1].GetPosition().x);
             requestAnimationFrame(animatePhysics);
         };
         animatePhysics();
