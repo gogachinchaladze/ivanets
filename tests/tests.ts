@@ -202,7 +202,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(
 			this.lfWorld,
 			circleShape,
-			1, 1, new b2Vec2(8,2),
+			1, 1, new b2Vec2(5.1,2),
 			2, 1, false, false,
 			1, CONNECTED_BODY)
 		
@@ -214,8 +214,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			dynamicBodyB,
 			new b2Vec2(0,0),
 			new b2Vec2(-1,0),
-			3,
-			2,
+			1,
 			4
 		)
 		
@@ -223,6 +222,8 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		var timeStep = 1.0 / 60.0;
 		var velocityIterations = 6
 		var positionIterations = 2
+		
+		
 
 		var animatePhysics = ()=>{
 			this.lfWorld.Step(timeStep, velocityIterations, positionIterations);

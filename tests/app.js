@@ -546,8 +546,21 @@ var mc = (function (_super) {
     };
     return mc;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
+var Ivane;
+(function (Ivane) {
+    var Assertion;
+    (function (Assertion) {
+        function DynamicAssert(condition, errorMessage) {
+            if (!condition) {
+                console.log(errorMessage);
+            }
+        }
+        Assertion.DynamicAssert = DynamicAssert;
+    })(Assertion = Ivane.Assertion || (Ivane.Assertion = {}));
+})(Ivane || (Ivane = {}));
 /// <reference path="../definitions/liquidfun/liquidfun.d.ts" />
 /// <reference path="Exceptions.ts" />
+/// <reference path="Assertion.ts" />
 var Ivane;
 (function (Ivane) {
     var LiquidFunHelpers;
@@ -558,11 +571,18 @@ var Ivane;
             return world;
         }
         LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable = createWorldAndRegisterItAsGlobalVariable;
-        function createDistanceJoint(world_ref, bodyA, bodyB, anchorA, anchorB, length, dampingRatio, //1 is recomended
+        function createDistanceJoint(world_ref, bodyA, bodyB, anchorA, anchorB, dampingRatio, //1 is recomended
             frequencyHz //4 is recomended
             ) {
             var distanceJointDef = new b2DistanceJointDef();
-            distanceJointDef.length = length;
+            var anchorAWorldPosition = new b2Vec2(bodyA.GetPosition().x + anchorA.x, bodyA.GetPosition().y + anchorA.y);
+            var anchorBWorldPosition = new b2Vec2(bodyB.GetPosition().x + anchorB.x, bodyB.GetPosition().y + anchorB.y);
+            var distanceBetweenAnchorAAndAnchorB = Math.sqrt(Math.pow(Math.abs(anchorBWorldPosition.x - anchorAWorldPosition.x), 2)
+                + Math.pow(Math.abs(anchorBWorldPosition.y - anchorAWorldPosition.y), 2));
+            Ivane.Assertion.DynamicAssert(length > .1, "value: "
+                + distanceBetweenAnchorAAndAnchorB.toString() +
+                " for b2DitanceJoint::length is too small");
+            distanceJointDef.length = distanceBetweenAnchorAAndAnchorB;
             distanceJointDef.dampingRatio = dampingRatio;
             distanceJointDef.frequencyHz = frequencyHz;
             distanceJointDef.InitializeAndCreate(bodyA, bodyB, anchorA, anchorB);
@@ -732,8 +752,8 @@ var GClass = (function (_super) {
         boxShape.SetAsBoxXY(.5, .5);
         var CONNECTED_BODY = 1;
         var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5, 2), 2, 1, false, false, 1, CONNECTED_BODY);
-        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(8, 2), 2, 1, false, false, 1, CONNECTED_BODY);
-        var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, dynamicBodyA, dynamicBodyB, new b2Vec2(0, 0), new b2Vec2(-1, 0), 3, 2, 4);
+        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5.1, 2), 2, 1, false, false, 1, CONNECTED_BODY);
+        var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, dynamicBodyA, dynamicBodyB, new b2Vec2(0, 0), new b2Vec2(-1, 0), 1, 4);
         var timeStep = 1.0 / 60.0;
         var velocityIterations = 6;
         var positionIterations = 2;

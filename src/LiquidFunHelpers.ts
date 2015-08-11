@@ -1,6 +1,6 @@
 /// <reference path="../definitions/liquidfun/liquidfun.d.ts" />
 /// <reference path="Exceptions.ts" />
-
+/// <reference path="Assertion.ts" />
 
 module Ivane.LiquidFunHelpers
 {
@@ -18,13 +18,37 @@ module Ivane.LiquidFunHelpers
 		bodyB:b2Body,
 		anchorA:b2Vec2,
 		anchorB:b2Vec2,
-		length:number,
 		dampingRatio:number,//1 is recomended
 		frequencyHz:number//4 is recomended
 		):b2DistanceJoint
-	{
+	{		
 		var distanceJointDef = new b2DistanceJointDef()
-		distanceJointDef.length = length
+
+		//Calculating b2DistanceJointDef::length
+		var anchorAWorldPosition = new b2Vec2(
+			bodyA.GetPosition().x + anchorA.x,
+			bodyA.GetPosition().y + anchorA.y)
+
+		var anchorBWorldPosition = new b2Vec2(
+			bodyB.GetPosition().x + anchorB.x,
+			bodyB.GetPosition().y + anchorB.y
+			)
+
+		var distanceBetweenAnchorAAndAnchorB = Math.sqrt(
+			Math.pow(
+				Math.abs(anchorBWorldPosition.x - anchorAWorldPosition.x),
+				2)
+			+ Math.pow(
+				Math.abs(anchorBWorldPosition.y - anchorAWorldPosition.y),
+				2)
+			)
+			
+		Ivane.Assertion.DynamicAssert(length > .1, "value: " 
+			+ distanceBetweenAnchorAAndAnchorB.toString() + 
+			" for b2DitanceJoint::length is too small")			
+		
+		distanceJointDef.length = distanceBetweenAnchorAAndAnchorB
+		
 		distanceJointDef.dampingRatio = dampingRatio
 		distanceJointDef.frequencyHz = frequencyHz
 		
