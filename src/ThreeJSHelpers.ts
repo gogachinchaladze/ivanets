@@ -2,7 +2,8 @@
 
 module Ivane.ThreeJSHelpers {
 
-	export function getOrtho2DCoordinatesFromPixelCoordinates(
+	export function getOrtho2DCoordinatesFromPixelCoordinates
+	(
 		viewWidthInPixels: number,
 		viewHeightInPixels: number,
 		pointerTopLeftXInPixels: number,
@@ -11,7 +12,8 @@ module Ivane.ThreeJSHelpers {
 		orthoCamera: THREE.OrthographicCamera,
 
 		ortho2DCoordiantes__out: THREE.Vector2
-		) {
+	) 
+	{
 		var orthoRangeOfX = -orthoCamera.left + orthoCamera.right
 		var orthoRangeOfY = -orthoCamera.bottom + orthoCamera.top
 
@@ -21,7 +23,13 @@ module Ivane.ThreeJSHelpers {
 		ortho2DCoordiantes__out.set(x, y)
 	}
 
-	export function orthoViewCoordinateToWorld(viewCoodinate: THREE.Vector2, orthoCamera: THREE.OrthographicCamera, worldCoordinate_out: THREE.Vector3) {
+	export function orthoViewCoordinateToWorld
+	( 
+		viewCoodinate: THREE.Vector2, 
+		orthoCamera: THREE.OrthographicCamera, 
+		worldCoordinate_out: THREE.Vector3 
+	) 
+	{
 		worldCoordinate_out.x = orthoCamera.position.x + viewCoodinate.x
 		worldCoordinate_out.y = orthoCamera.position.y + viewCoodinate.y
 		worldCoordinate_out.z = orthoCamera.position.z

@@ -148,7 +148,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 	lfWorld:b2World
 	
 	private test_liquidfun()
-	{
+	{		
 		var physlogDiv = <HTMLDivElement>document.getElementById("physlog")
 		var connectedBodiesDiv = <HTMLDivElement>document.getElementById("connectedbodies")
 		
