@@ -202,7 +202,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(
 			this.lfWorld,
 			circleShape,
-			1, 1, new b2Vec2(5.1,2),
+			1, 1, new b2Vec2(5.2,2),
 			2, 1, false, false,
 			1, CONNECTED_BODY)
 		
@@ -213,7 +213,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			dynamicBodyA,
 			dynamicBodyB,
 			new b2Vec2(0,0),
-			new b2Vec2(-1,0),
+			new b2Vec2(0,0),
 			1,
 			4
 		)
@@ -256,10 +256,20 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		animatePhysics()
 	}
 	
+	test_threejsHelpers()
+	{
+		var rectangleMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1,2,null)
+		
+		this.scene.add(rectangleMesh)
+				
+		rectangleMesh.position.set(-5,0,0)
+	}
+	
 	runtTests()
 	{
 		this.test_mergeGeometry()
 		this.test_liquidfun()
+		this.test_threejsHelpers()
 	}
 }
 

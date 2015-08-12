@@ -70,7 +70,7 @@ module Ivane.ThreeJSHelpers {
 		}
 	}
  
-	export function buildRectangleGeometry(width, height): THREE.Geometry {
+	export function createRectangleGeometry(width:number, height:number): THREE.Geometry {
 		
 		var geometry = new THREE.Geometry();
 		var halfWidth = width / 2;
@@ -99,6 +99,24 @@ module Ivane.ThreeJSHelpers {
 		geometry.computeVertexNormals();
 		
 		return geometry;
+	}
+	
+	export function createRectangleMesh(width:number, height:number, material_nullable:THREE.Material):THREE.Mesh
+	{
+		var geom = createRectangleGeometry(width,height)
+		
+		var rectangleMeshMaterial = material_nullable
+		
+		if(rectangleMeshMaterial == null)
+		{
+			rectangleMeshMaterial = new THREE.MeshBasicMaterial({
+				color:0xff0000
+			})	
+		}
+		
+		var rectangleMesh = new THREE.Mesh(geom,rectangleMeshMaterial)
+		
+		return rectangleMesh
 	}
 
 }

@@ -42,8 +42,8 @@ module Ivane.LiquidFunHelpers
 				Math.abs(anchorBWorldPosition.y - anchorAWorldPosition.y),
 				2)
 			)
-			
-		Ivane.Assertion.DynamicAssert(length > .1, "value: " 
+						
+		Ivane.Assertion.DynamicAssert(distanceBetweenAnchorAAndAnchorB > .1, "value: " 
 			+ distanceBetweenAnchorAAndAnchorB.toString() + 
 			" for b2DitanceJoint::length is too small")			
 		

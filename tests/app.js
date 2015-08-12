@@ -144,6 +144,8 @@ var Ivane;
         Exceptions.MethodNotOverriden = MethodNotOverriden;
         function NotImplemetedException() { }
         Exceptions.NotImplemetedException = NotImplemetedException;
+        function DynamicAssertionError() { }
+        Exceptions.DynamicAssertionError = DynamicAssertionError;
     })(Exceptions = Ivane.Exceptions || (Ivane.Exceptions = {}));
 })(Ivane || (Ivane = {}));
 ///<reference path="../definitions/threejs/three.d.ts"/>
@@ -419,7 +421,7 @@ var Ivane;
             }
         }
         ThreeJSHelpers.addGrid = addGrid;
-        function buildRectangleGeometry(width, height) {
+        function createRectangleGeometry(width, height) {
             var geometry = new THREE.Geometry();
             var halfWidth = width / 2;
             var halfHeight = height / 2;
@@ -444,7 +446,19 @@ var Ivane;
             geometry.computeVertexNormals();
             return geometry;
         }
-        ThreeJSHelpers.buildRectangleGeometry = buildRectangleGeometry;
+        ThreeJSHelpers.createRectangleGeometry = createRectangleGeometry;
+        function createRectangleMesh(width, height, material_nullable) {
+            var geom = createRectangleGeometry(width, height);
+            var rectangleMeshMaterial = material_nullable;
+            if (rectangleMeshMaterial == null) {
+                rectangleMeshMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xff0000
+                });
+            }
+            var rectangleMesh = new THREE.Mesh(geom, rectangleMeshMaterial);
+            return rectangleMesh;
+        }
+        ThreeJSHelpers.createRectangleMesh = createRectangleMesh;
     })(ThreeJSHelpers = Ivane.ThreeJSHelpers || (Ivane.ThreeJSHelpers = {}));
 })(Ivane || (Ivane = {}));
 ///<reference path="../definitions/threejs/three.d.ts" />
@@ -546,6 +560,7 @@ var mc = (function (_super) {
     };
     return mc;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
+/// <reference path="Exceptions.ts" />
 var Ivane;
 (function (Ivane) {
     var Assertion;
@@ -553,6 +568,7 @@ var Ivane;
         function DynamicAssert(condition, errorMessage) {
             if (!condition) {
                 console.log(errorMessage);
+                throw new Ivane.Exceptions.DynamicAssertionError();
             }
         }
         Assertion.DynamicAssert = DynamicAssert;
@@ -575,11 +591,12 @@ var Ivane;
             frequencyHz //4 is recomended
             ) {
             var distanceJointDef = new b2DistanceJointDef();
+            //Calculating b2DistanceJointDef::length
             var anchorAWorldPosition = new b2Vec2(bodyA.GetPosition().x + anchorA.x, bodyA.GetPosition().y + anchorA.y);
             var anchorBWorldPosition = new b2Vec2(bodyB.GetPosition().x + anchorB.x, bodyB.GetPosition().y + anchorB.y);
             var distanceBetweenAnchorAAndAnchorB = Math.sqrt(Math.pow(Math.abs(anchorBWorldPosition.x - anchorAWorldPosition.x), 2)
                 + Math.pow(Math.abs(anchorBWorldPosition.y - anchorAWorldPosition.y), 2));
-            Ivane.Assertion.DynamicAssert(length > .1, "value: "
+            Ivane.Assertion.DynamicAssert(distanceBetweenAnchorAAndAnchorB > .1, "value: "
                 + distanceBetweenAnchorAAndAnchorB.toString() +
                 " for b2DitanceJoint::length is too small");
             distanceJointDef.length = distanceBetweenAnchorAAndAnchorB;
@@ -752,8 +769,8 @@ var GClass = (function (_super) {
         boxShape.SetAsBoxXY(.5, .5);
         var CONNECTED_BODY = 1;
         var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5, 2), 2, 1, false, false, 1, CONNECTED_BODY);
-        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5.1, 2), 2, 1, false, false, 1, CONNECTED_BODY);
-        var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, dynamicBodyA, dynamicBodyB, new b2Vec2(0, 0), new b2Vec2(-1, 0), 1, 4);
+        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5.2, 2), 2, 1, false, false, 1, CONNECTED_BODY);
+        var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, dynamicBodyA, dynamicBodyB, new b2Vec2(0, 0), new b2Vec2(0, 0), 1, 4);
         var timeStep = 1.0 / 60.0;
         var velocityIterations = 6;
         var positionIterations = 2;
@@ -778,9 +795,15 @@ var GClass = (function (_super) {
         };
         animatePhysics();
     };
+    GClass.prototype.test_threejsHelpers = function () {
+        var rectangleMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1, 2, null);
+        this.scene.add(rectangleMesh);
+        rectangleMesh.position.set(-5, 0, 0);
+    };
     GClass.prototype.runtTests = function () {
         this.test_mergeGeometry();
         this.test_liquidfun();
+        this.test_threejsHelpers();
     };
     return GClass;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
