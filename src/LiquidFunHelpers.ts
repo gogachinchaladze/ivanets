@@ -1,4 +1,6 @@
-//Author Ivane Gegia http://ivane.info
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 
 /// <reference path="../definitions/liquidfun/liquidfun.d.ts" />
 /// <reference path="Exceptions.ts" />
