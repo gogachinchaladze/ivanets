@@ -31,7 +31,7 @@ declare class b2BodyDef
 declare class b2Fixture
 {
     SetDensity(density:number);
-    SetFilterData(filterData:b2Filter);
+    filter:b2Filter
 
     GetFriction():number;
     SetFriction(friction:number):void;
@@ -39,6 +39,7 @@ declare class b2Fixture
     GetRestitution():number;
     SetRestitution(restitution:number):void;
 
+    TestPoint(worldPoint:b2Vec2):boolean;
     GetBody():b2Body;
 }
 
@@ -49,6 +50,8 @@ declare class b2MassData
 
 declare class b2Body
 {
+    fixtures:b2Fixture[]
+    
     CreateFixtureFromShape(shape:b2Shape, density:number):b2Fixture;
     CreateFixtureFromDef(fixtureDefinition:b2FixtureDef):b2Fixture;
 
@@ -100,6 +103,7 @@ declare class b2Body
     GetInertia():number;
 
     GetWorldPoint(localPoint:b2Vec2):b2Vec2;
+    GetLocalPoint(worldPoint:b2Vec2):b2Vec2;
 
     SetGravityScale(gScale:number):void;
 
@@ -214,6 +218,7 @@ declare class b2FixtureDef
     density:number
     friction:number
     restitution:number
+    filter:b2Filter
 }
 
 //Joint definitions
@@ -243,6 +248,11 @@ declare class b2RevoluteJointDef extends b2JointDef
     enableLimit:boolean
     motorSpeed:number
     enableMotor:number
+    
+    localAnchorA:b2Vec2
+    localAnchorB:b2Vec2
+    
+    InitializeAndCreate(bodyA:b2Body, bodyB:b2Body, sharedAnchorInWorldSpace:b2Vec2);
 }
 
 declare class b2PrismaticJointDef extends b2JointDef
@@ -276,7 +286,7 @@ declare class b2DistanceJoint extends b2Joint
     
 }
 
-declare class b2RevoluteJoin extends b2Joint
+declare class b2RevoluteJoint extends b2Joint
 {
     GetJointAngle():number;
     GetJointSpeed():number;

@@ -60,6 +60,8 @@ module Ivane.ThreeJSHelpers {
 				verticalGridLineMesh.scale.set(2, 10, 2)
 				verticalGridLineMesh.material = greenLineMaterial
 			}
+			
+			verticalGridLineMesh.scale.set(2, 10, 2)
 
 			verticalGridLineMesh.position.set(-10 + x, 0, 0)
 		}
@@ -73,6 +75,8 @@ module Ivane.ThreeJSHelpers {
 				horizontalGridLineMesh.scale.set(1, 2, 2)
 				horizontalGridLineMesh.material = redLineMaterial
 			}
+			
+			horizontalGridLineMesh.scale.set(1, 2, 2)
 
 			horizontalGridLineMesh.position.set(0, -10 + y, 0)
 		}

@@ -408,6 +408,7 @@ var Ivane;
                     verticalGridLineMesh.scale.set(2, 10, 2);
                     verticalGridLineMesh.material = greenLineMaterial;
                 }
+                verticalGridLineMesh.scale.set(2, 10, 2);
                 verticalGridLineMesh.position.set(-10 + x, 0, 0);
             }
             for (var y = 0; y < 20; y++) {
@@ -417,6 +418,7 @@ var Ivane;
                     horizontalGridLineMesh.scale.set(1, 2, 2);
                     horizontalGridLineMesh.material = redLineMaterial;
                 }
+                horizontalGridLineMesh.scale.set(1, 2, 2);
                 horizontalGridLineMesh.position.set(0, -10 + y, 0);
             }
         }
@@ -587,6 +589,15 @@ var Ivane;
             return world;
         }
         LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable = createWorldAndRegisterItAsGlobalVariable;
+        function createRevoluteJoint(world_ref, bodyA, bodyB, sharedAnchorInWorldSpace) {
+            var revoluteJointDef = new b2RevoluteJointDef();
+            revoluteJointDef.InitializeAndCreate(bodyA, bodyB, sharedAnchorInWorldSpace);
+            revoluteJointDef.localAnchorA = bodyA.GetLocalPoint(sharedAnchorInWorldSpace);
+            revoluteJointDef.localAnchorB = bodyB.GetLocalPoint(sharedAnchorInWorldSpace);
+            var revoluteJoint = world_ref.CreateJoint(revoluteJointDef);
+            return revoluteJoint;
+        }
+        LiquidFunHelpers.createRevoluteJoint = createRevoluteJoint;
         function createDistanceJoint(world_ref, bodyA, bodyB, anchorA, anchorB, dampingRatio, //1 is recomended
             frequencyHz //4 is recomended
             ) {
@@ -609,7 +620,7 @@ var Ivane;
             return distanceJoint;
         }
         LiquidFunHelpers.createDistanceJoint = createDistanceJoint;
-        function createDynamicBody(world_ref, shape, density, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution, userData) {
+        function createDynamicBody(world_ref, shape, density, friction, position, linearDamping, angularDamping, fixedRotation, bullet, restitution, userData, filter_nullable) {
             var bodyDefinition = new b2BodyDef();
             bodyDefinition.active = true;
             bodyDefinition.position = position;
@@ -618,12 +629,16 @@ var Ivane;
             bodyDefinition.bullet = bullet;
             bodyDefinition.type = b2_dynamicBody;
             bodyDefinition.userData = userData;
+            bodyDefinition.filter = new b2Filter();
             var dynamicBody = world_ref.CreateBody(bodyDefinition);
             var bodyFixtureDefinition = new b2FixtureDef();
             bodyFixtureDefinition.density = density;
             bodyFixtureDefinition.friction = friction;
             bodyFixtureDefinition.shape = shape;
             bodyFixtureDefinition.restitution = restitution;
+            if (filter_nullable != null) {
+                bodyFixtureDefinition.filter = filter_nullable;
+            }
             dynamicBody.CreateFixtureFromDef(bodyFixtureDefinition);
             return dynamicBody;
         }
@@ -684,6 +699,7 @@ var GClass = (function (_super) {
     __extends(GClass, _super);
     function GClass() {
         _super.call(this);
+        this.subStepFunctions = new Array();
         this.logDiv = document.getElementById("log");
         this.initWithOrthoCamera({
             heigh: 10,
@@ -723,6 +739,9 @@ var GClass = (function (_super) {
         if (this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.s)) {
             this.sphereMesh.position.y -= 0.1;
         }
+        for (var subStepFunctionIndex = 0; subStepFunctionIndex < this.subStepFunctions.length; subStepFunctionIndex++) {
+            this.subStepFunctions[subStepFunctionIndex]();
+        }
     };
     GClass.prototype.addGrid = function () {
         var sphereGeom = new THREE.SphereGeometry(1);
@@ -751,25 +770,31 @@ var GClass = (function (_super) {
     };
     GClass.prototype.test_liquidfun = function () {
         var _this = this;
+        var GRAVITY = new b2Vec2(0, -21);
         var physlogDiv = document.getElementById("physlog");
         var connectedBodiesDiv = document.getElementById("connectedbodies");
-        this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(new b2Vec2(0, -9));
+        this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(GRAVITY);
         console.log(this.lfWorld);
         //Testing dynamic body creation
         var circleShape = new b2CircleShape();
         circleShape.radius = 1;
-        var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(0, 2), 2, 1, false, false, 1, null);
+        // var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(
+        // 	this.lfWorld,
+        // 	circleShape,
+        // 	1, 1, new b2Vec2(0,2),
+        // 	2, 1, false, false,
+        // 	1, null)
         //Testing kinematic body creation
         var boxShape = new b2PolygonShape();
-        boxShape.SetAsBoxXY(10, 1);
+        boxShape.SetAsBoxXY(40, 1);
         var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, 1, new b2Vec2(-5, -2), 1, 1, true, false, 0, null);
         //Testing static body creation function
         var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld, boxShape, 1, new b2Vec2(5, -2), 0, null);
         //Testing disntace joint	
         boxShape.SetAsBoxXY(.5, .5);
         var CONNECTED_BODY = 1;
-        var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5, 2), 2, 1, false, false, 1, CONNECTED_BODY);
-        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5.2, 2), 2, 1, false, false, 1, CONNECTED_BODY);
+        var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5, 2), 2, 1, false, false, 1, CONNECTED_BODY, null);
+        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5.2, 2), 2, 1, false, false, 1, CONNECTED_BODY, null);
         var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, dynamicBodyA, dynamicBodyB, new b2Vec2(0, 0), new b2Vec2(0, 0), 1, 4);
         var timeStep = 1.0 / 60.0;
         var velocityIterations = 6;
@@ -791,19 +816,106 @@ var GClass = (function (_super) {
                     + "<br/>bodyB <br/>x: " + connectedBodies[1].GetPosition().x
                     + "<br/>y: " + connectedBodies[1].GetPosition().y
                     + "<br/>distance: " + Math.abs(connectedBodies[0].GetPosition().x - connectedBodies[1].GetPosition().x);
-            requestAnimationFrame(animatePhysics);
+            //requestAnimationFrame(animatePhysics)
         };
-        animatePhysics();
+        this.subStepFunctions.push(animatePhysics);
     };
     GClass.prototype.test_threejsHelpers = function () {
         var rectangleMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1, 2, null);
         this.scene.add(rectangleMesh);
         rectangleMesh.position.set(-5, 0, 0);
     };
+    GClass.prototype.test_distance_joint_suspension = function () {
+        var _this = this;
+        var carBodyMesh = Ivane.ThreeJSHelpers.createRectangleMesh(6, 2, null);
+        var carLeftWheelMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1, 1, null);
+        var carRightWheelMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1, 1, null);
+        var CAR_BODY_COLLISION_CATEGORY = 0x0002;
+        var CAR_BODY_COLLISION_MASK = ~0x0002;
+        var carBodyCollisionFilter = new b2Filter();
+        carBodyCollisionFilter.categoryBits = CAR_BODY_COLLISION_CATEGORY;
+        carBodyCollisionFilter.maskBits = CAR_BODY_COLLISION_MASK;
+        var CAR_BODY_INDEX = 10;
+        var CAR_LEFT_WHEEL_INDEX = 11;
+        var CAR_RIGHT_WHEEL_INDEX = 12;
+        var DISTANCE_JOINT_DAMPING = 1;
+        var DISTANCE_JOINT_HERZ = 21;
+        var X_OFFSET = 1;
+        var physicsBodyMeshes = new Array();
+        physicsBodyMeshes[CAR_BODY_INDEX] = carBodyMesh;
+        physicsBodyMeshes[CAR_LEFT_WHEEL_INDEX] = carLeftWheelMesh;
+        physicsBodyMeshes[CAR_RIGHT_WHEEL_INDEX] = carRightWheelMesh;
+        for (var physicsBodyMeshIndex = 0; physicsBodyMeshIndex < physicsBodyMeshes.length; physicsBodyMeshIndex++) {
+            this.scene.add(physicsBodyMeshes[physicsBodyMeshIndex]);
+        }
+        //Creating car body and wheel carriers
+        var carBodyShape = new b2PolygonShape();
+        carBodyShape.SetAsBoxXY(3, 1);
+        var CAR_BODY_Y_OFFSET = 0.2;
+        var carBodyBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carBodyShape, 1, 0.1, new b2Vec2(0 + X_OFFSET, 2 + CAR_BODY_Y_OFFSET), 0.1, 0.1, false, false, 0, CAR_BODY_INDEX, carBodyCollisionFilter);
+        var carWheelShape = new b2CircleShape();
+        carWheelShape.radius = 0.1;
+        var carLeftWheelCarrierBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, 0.1, new b2Vec2(-1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, 0, null);
+        var carRightWheelCarrierBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, 0.1, new b2Vec2(1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, 0, null);
+        //left wheel carrier joints creation
+        Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, carBodyBody, carLeftWheelCarrierBody, new b2Vec2(-2, -1 - CAR_BODY_Y_OFFSET), new b2Vec2(0, 0), DISTANCE_JOINT_DAMPING, DISTANCE_JOINT_HERZ);
+        Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, carBodyBody, carLeftWheelCarrierBody, new b2Vec2(-1, -1 - CAR_BODY_Y_OFFSET), new b2Vec2(0, 0), DISTANCE_JOINT_DAMPING, DISTANCE_JOINT_HERZ);
+        //righ wheel carrier joints creation 	
+        Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, carBodyBody, carRightWheelCarrierBody, new b2Vec2(1, -1 - CAR_BODY_Y_OFFSET), new b2Vec2(0, 0), DISTANCE_JOINT_DAMPING, DISTANCE_JOINT_HERZ);
+        Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, carBodyBody, carRightWheelCarrierBody, new b2Vec2(2, -1 - CAR_BODY_Y_OFFSET), new b2Vec2(0, 0), DISTANCE_JOINT_DAMPING, DISTANCE_JOINT_HERZ);
+        //Creating left and right wheel and attaching them to wheel carriers
+        carWheelShape.radius = 0.5;
+        var carLeftWheelBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, 1, new b2Vec2(-1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, CAR_LEFT_WHEEL_INDEX, carBodyCollisionFilter);
+        Ivane.LiquidFunHelpers.createRevoluteJoint(this.lfWorld, carLeftWheelCarrierBody, carLeftWheelBody, carLeftWheelBody.GetWorldCenter());
+        var carRightWheelBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, 1, new b2Vec2(1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, CAR_RIGHT_WHEEL_INDEX, carBodyCollisionFilter);
+        var revoluteJoint = Ivane.LiquidFunHelpers.createRevoluteJoint(this.lfWorld, carRightWheelCarrierBody, carRightWheelBody, carRightWheelBody.GetWorldCenter());
+        var localCenter = new b2Vec2(0, 0);
+        console.log(carBodyBody);
+        var getLocalPointDiv = document.getElementById("GetLocalPoint");
+        var worldPoint = new b2Vec2(0, 0);
+        var localPoint = new b2Vec2(0, 0);
+        var renderDistanceJointSuspension = function () {
+            for (var bodyIndex = 0; bodyIndex < _this.lfWorld.bodies.length; bodyIndex++) {
+                var physicsBody = _this.lfWorld.bodies[bodyIndex];
+                var meshIndex = physicsBody.GetUserData();
+                if (meshIndex >= CAR_BODY_INDEX
+                    && meshIndex <= CAR_RIGHT_WHEEL_INDEX) {
+                    var bodyMesh = physicsBodyMeshes[meshIndex];
+                    var physicsBodyPosition = physicsBody.GetPosition();
+                    var physicsBodyRotation = physicsBody.GetAngle();
+                    bodyMesh.position.set(physicsBodyPosition.x, physicsBodyPosition.y, 0);
+                    bodyMesh.rotation.z = physicsBodyRotation;
+                    var TORQUE_AMMOUNT = 5;
+                    if (_this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.left_arrow)) {
+                        carLeftWheelBody.ApplyTorque(TORQUE_AMMOUNT, true);
+                        carRightWheelBody.ApplyTorque(TORQUE_AMMOUNT, true);
+                    }
+                    if (_this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.right_arrow)) {
+                        carLeftWheelBody.ApplyTorque(-TORQUE_AMMOUNT, true);
+                        carRightWheelBody.ApplyTorque(-TORQUE_AMMOUNT, true);
+                    }
+                }
+            }
+            worldPoint.x = _this.mouseXYMainOrthoCameraWorld.x;
+            worldPoint.y = _this.mouseXYMainOrthoCameraWorld.y;
+            localPoint = carBodyBody.GetLocalPoint(worldPoint);
+            var testPoint = carBodyBody.fixtures[0].TestPoint(worldPoint);
+            getLocalPointDiv.innerHTML = "<pre>"
+                + "carBodyBody::GetLocalPoint for"
+                + "\n x: " + worldPoint.x
+                + "\n y: " + worldPoint.y
+                + "\n is \n x: " + localPoint.x
+                + "\n y: " + localPoint.y
+                + "\n testPoint: " + testPoint
+                + "</pre>";
+        };
+        this.subStepFunctions.push(renderDistanceJointSuspension);
+    };
     GClass.prototype.runtTests = function () {
         this.test_mergeGeometry();
         this.test_liquidfun();
         this.test_threejsHelpers();
+        this.test_distance_joint_suspension();
     };
     return GClass;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);

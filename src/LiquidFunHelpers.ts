@@ -12,6 +12,31 @@ module Ivane.LiquidFunHelpers
 		return world;
 	}
 	
+	export function createRevoluteJoint(
+		world_ref:b2World,
+		bodyA:b2Body,
+		bodyB:b2Body,
+		sharedAnchorInWorldSpace:b2Vec2
+	):b2RevoluteJoint
+	{
+		var revoluteJointDef = new b2RevoluteJointDef()
+		
+		revoluteJointDef.InitializeAndCreate
+		(
+			bodyA,
+			bodyB,
+			sharedAnchorInWorldSpace	
+		)	
+		
+		revoluteJointDef.localAnchorA = bodyA.GetLocalPoint(sharedAnchorInWorldSpace)
+		
+		revoluteJointDef.localAnchorB = bodyB.GetLocalPoint(sharedAnchorInWorldSpace)
+				
+		var revoluteJoint = <b2RevoluteJoint>world_ref.CreateJoint(revoluteJointDef)
+			
+		return revoluteJoint
+	}
+	
 	export function createDistanceJoint(
 		world_ref:b2World,
 		bodyA:b2Body,
@@ -73,7 +98,8 @@ module Ivane.LiquidFunHelpers
 		fixedRotation:boolean,
 		bullet:boolean,
 		restitution:number,
-		userData:number
+		userData:number,
+		filter_nullable:b2Filter
 		):b2Body
 	{
 		var bodyDefinition = new b2BodyDef()
@@ -84,6 +110,7 @@ module Ivane.LiquidFunHelpers
 		bodyDefinition.bullet = bullet
 		bodyDefinition.type = b2_dynamicBody
 		bodyDefinition.userData = userData
+		bodyDefinition.filter = new b2Filter()
 		
 		var dynamicBody = world_ref.CreateBody(bodyDefinition)		
 			
@@ -92,6 +119,11 @@ module Ivane.LiquidFunHelpers
 		bodyFixtureDefinition.friction = friction
 		bodyFixtureDefinition.shape = shape
 		bodyFixtureDefinition.restitution = restitution
+		
+		if(filter_nullable != null)
+		{
+			bodyFixtureDefinition.filter = filter_nullable
+		}
 		
 		dynamicBody.CreateFixtureFromDef(bodyFixtureDefinition)
 		

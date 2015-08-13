@@ -100,7 +100,17 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			{
 				this.sphereMesh.position.y -= 0.1
 			}
-		
+			
+			for
+			(
+				var subStepFunctionIndex = 0; 
+				subStepFunctionIndex < this.subStepFunctions.length;
+				subStepFunctionIndex++
+			)
+			{
+				this.subStepFunctions[subStepFunctionIndex]()
+			}
+	
 	}
 	
 	sphereMesh:THREE.Mesh
@@ -145,14 +155,20 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		mesh.position.set(-2,-2,0)
 	}
 	
+	subStepFunctions:Function[] = new Array<Function>()
+	
 	lfWorld:b2World
+	
+	
 	
 	private test_liquidfun()
 	{		
+		const GRAVITY = new b2Vec2(0,-21)
+		
 		var physlogDiv = <HTMLDivElement>document.getElementById("physlog")
 		var connectedBodiesDiv = <HTMLDivElement>document.getElementById("connectedbodies")
 		
-		this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(new b2Vec2(0,-9))
+		this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(GRAVITY)
 		
 		console.log(this.lfWorld)
 		
@@ -160,16 +176,16 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		var circleShape = new b2CircleShape()
 		circleShape.radius = 1
 		
-		var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(
-			this.lfWorld,
-			circleShape,
-			1, 1, new b2Vec2(0,2),
-			2, 1, false, false,
-			1, null)
+		// var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(
+		// 	this.lfWorld,
+		// 	circleShape,
+		// 	1, 1, new b2Vec2(0,2),
+		// 	2, 1, false, false,
+		// 	1, null)
 			
 		//Testing kinematic body creation
 		var boxShape = new b2PolygonShape()
-		boxShape.SetAsBoxXY(10,1)
+		boxShape.SetAsBoxXY(40,1)
 		
 		var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(
 			this.lfWorld,
@@ -192,19 +208,23 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		
 		var CONNECTED_BODY = 1
 			
-		var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(
+		var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody
+		(
 			this.lfWorld,
 			circleShape,
 			1, 1, new b2Vec2(5,2),
 			2, 1, false, false,
-			1, CONNECTED_BODY)
+			1, CONNECTED_BODY,null
+		)
 			
-		var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(
+		var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody
+		(
 			this.lfWorld,
 			circleShape,
 			1, 1, new b2Vec2(5.2,2),
 			2, 1, false, false,
-			1, CONNECTED_BODY)
+			1, CONNECTED_BODY,null
+		)
 		
 		
 	
@@ -233,7 +253,12 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			
 			var connectedBodies = new Array<b2Body>()
 			
-			for(var bodyIndex = 0; bodyIndex < this.lfWorld.bodies.length; bodyIndex++)
+			for
+			(
+				var bodyIndex = 0; 
+				bodyIndex < this.lfWorld.bodies.length; 
+				bodyIndex++
+			)
 			{
 				var connectedBody = this.lfWorld.bodies[bodyIndex]
 								
@@ -250,10 +275,10 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			+ "<br/>y: " + connectedBodies[1].GetPosition().y
 			+ "<br/>distance: " + Math.abs(connectedBodies[0].GetPosition().x - connectedBodies[1].GetPosition().x)
 			
-			requestAnimationFrame(animatePhysics)
+			//requestAnimationFrame(animatePhysics)
 		}	
 		
-		animatePhysics()
+		this.subStepFunctions.push(animatePhysics)
 	}
 	
 	test_threejsHelpers()
@@ -265,11 +290,220 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		rectangleMesh.position.set(-5,0,0)
 	}
 	
+	test_distance_joint_suspension()
+	{
+		var carBodyMesh = Ivane.ThreeJSHelpers.createRectangleMesh(6,2,null)
+		var carLeftWheelMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1,1,null)
+		var carRightWheelMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1,1,null)
+		
+		const CAR_BODY_COLLISION_CATEGORY = 0x0002
+		const CAR_BODY_COLLISION_MASK = ~0x0002
+		
+		var carBodyCollisionFilter = new b2Filter()
+		carBodyCollisionFilter.categoryBits = CAR_BODY_COLLISION_CATEGORY
+		carBodyCollisionFilter.maskBits = CAR_BODY_COLLISION_MASK
+		
+		const CAR_BODY_INDEX = 10
+		const CAR_LEFT_WHEEL_INDEX = 11
+		const CAR_RIGHT_WHEEL_INDEX = 12
+		
+		const DISTANCE_JOINT_DAMPING = 1
+		const DISTANCE_JOINT_HERZ = 21
+		
+		const X_OFFSET = 1
+		
+		var physicsBodyMeshes:THREE.Mesh[] = new Array<THREE.Mesh>()	
+		
+		physicsBodyMeshes[CAR_BODY_INDEX] = carBodyMesh
+		physicsBodyMeshes[CAR_LEFT_WHEEL_INDEX] = carLeftWheelMesh
+		physicsBodyMeshes[CAR_RIGHT_WHEEL_INDEX] = carRightWheelMesh
+		
+		for
+		(
+			var physicsBodyMeshIndex = 0;
+			physicsBodyMeshIndex < physicsBodyMeshes.length;
+			physicsBodyMeshIndex++
+		)
+		{
+			this.scene.add( physicsBodyMeshes[physicsBodyMeshIndex] )	
+		}
+		
+		//Creating car body and wheel carriers
+		var carBodyShape = new b2PolygonShape()
+		carBodyShape.SetAsBoxXY(3,1)
+		
+		const CAR_BODY_Y_OFFSET = 0.2
+		
+		var carBodyBody = Ivane.LiquidFunHelpers.createDynamicBody
+		(
+			this.lfWorld, carBodyShape, 1,0.1,new b2Vec2(0 + X_OFFSET,2 + CAR_BODY_Y_OFFSET),
+			0.1,0.1,false, false,0,CAR_BODY_INDEX,carBodyCollisionFilter
+		)
+		
+		var carWheelShape = new b2CircleShape()
+		carWheelShape.radius = 0.1
+		
+		
+		var carLeftWheelCarrierBody = Ivane.LiquidFunHelpers.createDynamicBody
+		(
+			this.lfWorld, carWheelShape, 1,0.1,new b2Vec2(-1.5 + X_OFFSET,1),
+			0.1,0.1,false, false,0,0,null
+		)
+		
+		var carRightWheelCarrierBody = Ivane.LiquidFunHelpers.createDynamicBody
+		(
+			this.lfWorld, carWheelShape, 1,0.1,new b2Vec2(1.5 + X_OFFSET,1),
+			0.1,0.1,false, false,0,0,null
+		)	
+		
+		//left wheel carrier joints creation
+		Ivane.LiquidFunHelpers.createDistanceJoint
+		(
+			this.lfWorld, carBodyBody, carLeftWheelCarrierBody,
+			new b2Vec2(-2,-1 - CAR_BODY_Y_OFFSET), 
+			new b2Vec2(0,0), DISTANCE_JOINT_DAMPING,DISTANCE_JOINT_HERZ
+		)
+		
+		Ivane.LiquidFunHelpers.createDistanceJoint
+		(
+			this.lfWorld, carBodyBody, carLeftWheelCarrierBody,
+			new b2Vec2(-1,-1 - CAR_BODY_Y_OFFSET), 
+			new b2Vec2(0,0), DISTANCE_JOINT_DAMPING,DISTANCE_JOINT_HERZ
+		)		
+		
+		//righ wheel carrier joints creation 	
+		Ivane.LiquidFunHelpers.createDistanceJoint
+		(
+			this.lfWorld, carBodyBody, carRightWheelCarrierBody,
+			new b2Vec2(1,-1 - CAR_BODY_Y_OFFSET), 
+			new b2Vec2(0,0), DISTANCE_JOINT_DAMPING,DISTANCE_JOINT_HERZ
+		)
+		
+		Ivane.LiquidFunHelpers.createDistanceJoint
+		(
+			this.lfWorld, carBodyBody, carRightWheelCarrierBody,
+			new b2Vec2(2,-1 - CAR_BODY_Y_OFFSET), 
+			new b2Vec2(0,0), DISTANCE_JOINT_DAMPING,DISTANCE_JOINT_HERZ
+		)	
+		
+		//Creating left and right wheel and attaching them to wheel carriers
+		carWheelShape.radius = 0.5
+		
+		var carLeftWheelBody = Ivane.LiquidFunHelpers.createDynamicBody
+		(
+			this.lfWorld, carWheelShape, 1,1,new b2Vec2(-1.5 + X_OFFSET,1),
+			0.1,0.1,false, false,0,CAR_LEFT_WHEEL_INDEX,carBodyCollisionFilter
+		)			
+		
+		Ivane.LiquidFunHelpers.createRevoluteJoint
+		(
+			this.lfWorld,
+			carLeftWheelCarrierBody, 
+			carLeftWheelBody, 
+			carLeftWheelBody.GetWorldCenter()
+		)	
+		
+		var carRightWheelBody = Ivane.LiquidFunHelpers.createDynamicBody
+		(
+			this.lfWorld, carWheelShape, 1,1,new b2Vec2(1.5 + X_OFFSET,1),
+			0.1,0.1,false, false,0,CAR_RIGHT_WHEEL_INDEX,carBodyCollisionFilter
+		)	
+		
+		var revoluteJoint = Ivane.LiquidFunHelpers.createRevoluteJoint
+		(
+			this.lfWorld,
+			carRightWheelCarrierBody, 
+			carRightWheelBody, 
+			carRightWheelBody.GetWorldCenter()
+		)		
+		
+		var localCenter = new b2Vec2(0,0)
+		
+
+		
+		console.log(carBodyBody)
+		
+		var getLocalPointDiv = <HTMLDivElement>document.getElementById("GetLocalPoint")
+		
+		var worldPoint:b2Vec2 = new b2Vec2(0,0)
+		var localPoint:b2Vec2 = new b2Vec2(0,0)
+		
+		var renderDistanceJointSuspension = ()=>{
+			
+			for
+			(
+				var bodyIndex = 0; 
+				bodyIndex < this.lfWorld.bodies.length;
+				bodyIndex++
+			)
+			{
+				var physicsBody = this.lfWorld.bodies[bodyIndex]
+				var meshIndex = physicsBody.GetUserData()
+				
+				if
+				(
+					meshIndex >= CAR_BODY_INDEX
+					&& meshIndex <= CAR_RIGHT_WHEEL_INDEX
+				)
+				{
+					var bodyMesh = physicsBodyMeshes[meshIndex]
+					
+					var physicsBodyPosition = physicsBody.GetPosition()
+					var physicsBodyRotation = physicsBody.GetAngle()
+					
+					bodyMesh.position.set
+					(
+						physicsBodyPosition.x,
+						physicsBodyPosition.y,
+						0
+					)
+					
+					bodyMesh.rotation.z = physicsBodyRotation
+					
+					const TORQUE_AMMOUNT = 5
+					
+					if(this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.left_arrow))
+					{
+						carLeftWheelBody.ApplyTorque(TORQUE_AMMOUNT,true)
+						carRightWheelBody.ApplyTorque(TORQUE_AMMOUNT,true)		
+					}
+					
+					if(this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.right_arrow))
+					{
+						carLeftWheelBody.ApplyTorque(-TORQUE_AMMOUNT,true)
+						carRightWheelBody.ApplyTorque(-TORQUE_AMMOUNT,true)	
+					}
+					
+					
+				}
+			}
+			
+			worldPoint.x = this.mouseXYMainOrthoCameraWorld.x
+			worldPoint.y = this.mouseXYMainOrthoCameraWorld.y
+			
+			localPoint = carBodyBody.GetLocalPoint(worldPoint)
+			
+			var testPoint = carBodyBody.fixtures[0].TestPoint(worldPoint)
+			
+			getLocalPointDiv.innerHTML = "<pre>"
+			+ "carBodyBody::GetLocalPoint for"
+			+ "\n x: " + worldPoint.x
+			+ "\n y: " + worldPoint.y
+			+ "\n is \n x: " + localPoint.x
+			+ "\n y: " + localPoint.y
+			+ "\n testPoint: " + testPoint
+			+ "</pre>"
+		}
+		
+		this.subStepFunctions.push(renderDistanceJointSuspension)
+	}
+	
 	runtTests()
 	{
 		this.test_mergeGeometry()
 		this.test_liquidfun()
 		this.test_threejsHelpers()
+		this.test_distance_joint_suspension()
 	}
 }
 
