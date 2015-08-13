@@ -1,3 +1,7 @@
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
+
 /// <reference path="three.d.ts" />
 
 declare module THREE

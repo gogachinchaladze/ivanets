@@ -1,3 +1,7 @@
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
+
 ///<reference path="../definitions/threejs/three.d.ts"/>
 
 module Ivane.ThreeJSHelpers {

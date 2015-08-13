@@ -1,9 +1,5 @@
-/*!
- *
- *  (c) 2015, Ivane Gegia
- *  http://ivane.info
- *
- *  MIT License
+/*
+ * Author Ivane Gegia http://ivane.info
  */
 
 module Ivane.Utils {

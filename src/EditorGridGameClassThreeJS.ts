@@ -1,3 +1,7 @@
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
+
 /// <reference path="GameClassThreeJS.ts" />
 
 module Ivane.ThreeJSHelpers

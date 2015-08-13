@@ -1,3 +1,7 @@
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
+
 declare class b2Vec2
 {
     constructor(x:number,y:number);

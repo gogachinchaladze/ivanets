@@ -1,5 +1,8 @@
-/// <reference path="Exceptions.ts" />
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 
+/// <reference path="Exceptions.ts" />
 
 module Ivane.Assertion
 {

@@ -775,9 +775,6 @@ var GClass = (function (_super) {
         var connectedBodiesDiv = document.getElementById("connectedbodies");
         this.lfWorld = Ivane.LiquidFunHelpers.createWorldAndRegisterItAsGlobalVariable(GRAVITY);
         console.log(this.lfWorld);
-        //Testing dynamic body creation
-        var circleShape = new b2CircleShape();
-        circleShape.radius = 1;
         // var dynamicCircle = Ivane.LiquidFunHelpers.createDynamicBody(
         // 	this.lfWorld,
         // 	circleShape,
@@ -789,33 +786,16 @@ var GClass = (function (_super) {
         boxShape.SetAsBoxXY(40, 1);
         var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, 1, new b2Vec2(-5, -2), 1, 1, true, false, 0, null);
         //Testing static body creation function
-        var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld, boxShape, 1, new b2Vec2(5, -2), 0, null);
+        boxShape.SetAsBoxXY(5, 1);
+        var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld, boxShape, 1, new b2Vec2(0, -1.85), 0, null);
         //Testing disntace joint	
         boxShape.SetAsBoxXY(.5, .5);
         var CONNECTED_BODY = 1;
-        var dynamicBodyA = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5, 2), 2, 1, false, false, 1, CONNECTED_BODY, null);
-        var dynamicBodyB = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, circleShape, 1, 1, new b2Vec2(5.2, 2), 2, 1, false, false, 1, CONNECTED_BODY, null);
-        var distanceJoint = Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, dynamicBodyA, dynamicBodyB, new b2Vec2(0, 0), new b2Vec2(0, 0), 1, 4);
         var timeStep = 1.0 / 60.0;
         var velocityIterations = 6;
         var positionIterations = 2;
         var animatePhysics = function () {
             _this.lfWorld.Step(timeStep, velocityIterations, positionIterations);
-            physlogDiv.innerHTML = "x:" + _this.lfWorld.bodies[0].GetPosition().x
-                + "<br/> y: " + _this.lfWorld.bodies[0].GetPosition().y;
-            var connectedBodies = new Array();
-            for (var bodyIndex = 0; bodyIndex < _this.lfWorld.bodies.length; bodyIndex++) {
-                var connectedBody = _this.lfWorld.bodies[bodyIndex];
-                if (connectedBody.GetUserData() == CONNECTED_BODY) {
-                    connectedBodies.push(connectedBody);
-                }
-            }
-            connectedBodiesDiv.innerHTML =
-                "bodyA <br/>x: " + connectedBodies[0].GetPosition().x
-                    + "<br/>y: " + connectedBodies[0].GetPosition().y
-                    + "<br/>bodyB <br/>x: " + connectedBodies[1].GetPosition().x
-                    + "<br/>y: " + connectedBodies[1].GetPosition().y
-                    + "<br/>distance: " + Math.abs(connectedBodies[0].GetPosition().x - connectedBodies[1].GetPosition().x);
             //requestAnimationFrame(animatePhysics)
         };
         this.subStepFunctions.push(animatePhysics);
@@ -825,7 +805,7 @@ var GClass = (function (_super) {
         this.scene.add(rectangleMesh);
         rectangleMesh.position.set(-5, 0, 0);
     };
-    GClass.prototype.test_distance_joint_suspension = function () {
+    GClass.prototype.test_distance_and_revolute_joint_suspension = function () {
         var _this = this;
         var carBodyMesh = Ivane.ThreeJSHelpers.createRectangleMesh(6, 2, null);
         var carLeftWheelMesh = Ivane.ThreeJSHelpers.createRectangleMesh(1, 1, null);
@@ -885,7 +865,7 @@ var GClass = (function (_super) {
                     var physicsBodyRotation = physicsBody.GetAngle();
                     bodyMesh.position.set(physicsBodyPosition.x, physicsBodyPosition.y, 0);
                     bodyMesh.rotation.z = physicsBodyRotation;
-                    var TORQUE_AMMOUNT = 5;
+                    var TORQUE_AMMOUNT = 8;
                     if (_this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.left_arrow)) {
                         carLeftWheelBody.ApplyTorque(TORQUE_AMMOUNT, true);
                         carRightWheelBody.ApplyTorque(TORQUE_AMMOUNT, true);
@@ -914,8 +894,8 @@ var GClass = (function (_super) {
     GClass.prototype.runtTests = function () {
         this.test_mergeGeometry();
         this.test_liquidfun();
-        this.test_threejsHelpers();
-        this.test_distance_joint_suspension();
+        //this.test_threejsHelpers()
+        this.test_distance_and_revolute_joint_suspension();
     };
     return GClass;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
