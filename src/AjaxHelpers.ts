@@ -65,7 +65,7 @@ module Ivane.Network.Ajax
 	export function createAJAXRequest(
 		url:string,
 		requestType:REQUEST_TYPES,
-		data_nullable:(Object|String),
+		data_nullable: Object | String,
 		onSuccess:AJAXRequestSuccessDelegate,
 		onFail:AJAXReuqestFailDelegate
 		):XMLHttpRequest
@@ -131,7 +131,18 @@ module Ivane.Network.Ajax
 		}
 		else if(requestType == REQUEST_TYPES.POST)
 		{
-			throw new Ivane.Exceptions.NotImplemetedException()	
+			ajaxRequest.open
+			(
+				getStringForREQUEST_TYPES(requestType),
+				url, true
+			)
+			
+			ajaxRequest.setRequestHeader
+			(
+				"Content-type","application/x-www-form-urlencoded"
+			)
+			
+			ajaxRequest.send(<string>urlEncodedParameters.replace("?",""))	
 		}
 		
 		ajaxRequest.onreadystatechange = (ev:ProgressEvent) => {

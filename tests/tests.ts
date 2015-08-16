@@ -184,7 +184,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(
 			this.lfWorld,
 			boxShape,
-			1,
+			.4,
 			new b2Vec2(-5,-2),
 			1, 1, true, false,
 			0, null)
@@ -287,7 +287,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		
 		var carLeftWheelCarrierBody = Ivane.LiquidFunHelpers.createDynamicBody
 		(
-			this.lfWorld, carWheelShape, 1,0.1,new b2Vec2(-1.5 + X_OFFSET,1),
+			this.lfWorld, carWheelShape, 1, 0.1,new b2Vec2(-1.5 + X_OFFSET,1),
 			0.1,0.1,false, false,0,0,null
 		)
 		
@@ -330,9 +330,12 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		//Creating left and right wheel and attaching them to wheel carriers
 		carWheelShape.radius = 0.5
 		
+		const WHEEL_FRICTION = 0.5
+		
 		var carLeftWheelBody = Ivane.LiquidFunHelpers.createDynamicBody
 		(
-			this.lfWorld, carWheelShape, 1,1,new b2Vec2(-1.5 + X_OFFSET,1),
+			this.lfWorld, carWheelShape, 1, 
+			WHEEL_FRICTION,new b2Vec2(-1.5 + X_OFFSET,1),
 			0.1,0.1,false, false,0,CAR_LEFT_WHEEL_INDEX,carBodyCollisionFilter
 		)			
 		
@@ -346,7 +349,8 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		
 		var carRightWheelBody = Ivane.LiquidFunHelpers.createDynamicBody
 		(
-			this.lfWorld, carWheelShape, 1,1,new b2Vec2(1.5 + X_OFFSET,1),
+			this.lfWorld, carWheelShape, 1,
+			WHEEL_FRICTION,new b2Vec2(1.5 + X_OFFSET,1),
 			0.1,0.1,false, false,0,CAR_RIGHT_WHEEL_INDEX,carBodyCollisionFilter
 		)	
 		
@@ -453,14 +457,31 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 				param1: "value 1",
 				param2: "value2"
 			},
-			(result)=>{
+			(result) => {
 				console.log("ajax onResult")
 				console.log(result)
 			},
-			()=>{
+			() => {
 				console.log("ajax onFail")
 			}
 		)
+		
+		AJAX.createAJAXRequest
+		(
+			"/tests/download_test.txt",
+			AJAX.REQUEST_TYPES.POST,
+			{
+				param1: "value 1",
+				param2: "value2"
+			},
+			(result) => {
+				console.log("ajax onResult")
+				console.log(result)
+			},
+			() => {
+				console.log("ajax onFail")
+			}
+		)		
 	}
 	
 	test_ajax_helper_and_threejs_obj()
@@ -481,7 +502,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		//this.test_threejsHelpers()
 		this.test_distance_and_revolute_joint_suspension()
 		this.test_ajax_request()
-		this.test_ajax_helper_and_threejs_obj()
+		//this.test_ajax_helper_and_threejs_obj()
 	}
 }
 

@@ -70,7 +70,9 @@ var Ivane;
                     ajaxRequest.send();
                 }
                 else if (requestType == REQUEST_TYPES.POST) {
-                    throw new Ivane.Exceptions.NotImplemetedException();
+                    ajaxRequest.open(getStringForREQUEST_TYPES(requestType), url, true);
+                    ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    ajaxRequest.send(urlEncodedParameters.replace("?", ""));
                 }
                 ajaxRequest.onreadystatechange = function (ev) {
                     if (ajaxRequest.readyState == AJAX_READY_STATES.REQUEST_FINISHED_AND_RESPOSNE_IS_READY
@@ -966,7 +968,7 @@ var GClass = (function (_super) {
         //Testing kinematic body creation
         var boxShape = new b2PolygonShape();
         boxShape.SetAsBoxXY(500, 1);
-        var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, 1, new b2Vec2(-5, -2), 1, 1, true, false, 0, null);
+        var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, .4, new b2Vec2(-5, -2), 1, 1, true, false, 0, null);
         //Testing static body creation function
         boxShape.SetAsBoxXY(5, 1);
         var staticBody = Ivane.LiquidFunHelpers.createStaticBody(this.lfWorld, boxShape, 1, new b2Vec2(0, -1.85), 0, null);
@@ -1027,9 +1029,10 @@ var GClass = (function (_super) {
         Ivane.LiquidFunHelpers.createDistanceJoint(this.lfWorld, carBodyBody, carRightWheelCarrierBody, new b2Vec2(2, -1 - CAR_BODY_Y_OFFSET), new b2Vec2(0, 0), DISTANCE_JOINT_DAMPING, DISTANCE_JOINT_HERZ);
         //Creating left and right wheel and attaching them to wheel carriers
         carWheelShape.radius = 0.5;
-        var carLeftWheelBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, 1, new b2Vec2(-1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, CAR_LEFT_WHEEL_INDEX, carBodyCollisionFilter);
+        var WHEEL_FRICTION = 0.5;
+        var carLeftWheelBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, WHEEL_FRICTION, new b2Vec2(-1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, CAR_LEFT_WHEEL_INDEX, carBodyCollisionFilter);
         Ivane.LiquidFunHelpers.createRevoluteJoint(this.lfWorld, carLeftWheelCarrierBody, carLeftWheelBody, carLeftWheelBody.GetWorldCenter());
-        var carRightWheelBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, 1, new b2Vec2(1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, CAR_RIGHT_WHEEL_INDEX, carBodyCollisionFilter);
+        var carRightWheelBody = Ivane.LiquidFunHelpers.createDynamicBody(this.lfWorld, carWheelShape, 1, WHEEL_FRICTION, new b2Vec2(1.5 + X_OFFSET, 1), 0.1, 0.1, false, false, 0, CAR_RIGHT_WHEEL_INDEX, carBodyCollisionFilter);
         var revoluteJoint = Ivane.LiquidFunHelpers.createRevoluteJoint(this.lfWorld, carRightWheelCarrierBody, carRightWheelBody, carRightWheelBody.GetWorldCenter());
         var localCenter = new b2Vec2(0, 0);
         console.log(carBodyBody);
@@ -1085,6 +1088,15 @@ var GClass = (function (_super) {
         }, function () {
             console.log("ajax onFail");
         });
+        AJAX.createAJAXRequest("/tests/download_test.txt", AJAX.REQUEST_TYPES.POST, {
+            param1: "value 1",
+            param2: "value2"
+        }, function (result) {
+            console.log("ajax onResult");
+            console.log(result);
+        }, function () {
+            console.log("ajax onFail");
+        });
     };
     GClass.prototype.test_ajax_helper_and_threejs_obj = function () {
         var _this = this;
@@ -1098,7 +1110,7 @@ var GClass = (function (_super) {
         //this.test_threejsHelpers()
         this.test_distance_and_revolute_joint_suspension();
         this.test_ajax_request();
-        this.test_ajax_helper_and_threejs_obj();
+        //this.test_ajax_helper_and_threejs_obj()
     };
     return GClass;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
