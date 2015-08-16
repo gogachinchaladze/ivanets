@@ -9,8 +9,6 @@
 
 module Ivane.ThreeJSHelpers
 {
-	
-	
 	export interface OrthoCameraSettings
 	{
 		heigh:number

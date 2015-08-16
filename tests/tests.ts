@@ -1,10 +1,4 @@
-///<reference path="../src/AnimationsManager.ts"/>
-///<reference path="../src/DeltaTime.ts" />
-///<reference path="../src/GameClassThreeJS.ts"/>
-///<reference path="../src/ThreeJSHelpers.ts"/>
-///<reference path="../src/LiquidFunHelpers.ts" />
-/// <reference path="../src/AjaxHelpers.ts" />
-
+/// <reference path="../Ivane_Main.ts" />
 
 var animationsManager = new Ivane.Animation.AnimationsManager(32)
 
@@ -453,15 +447,29 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		
 		AJAX.createAJAXRequest
 		(
-			"/test/download_test.txt",
+			"/tests/download_test.txt",
 			AJAX.REQUEST_TYPES.GET,
-			null,
+			{
+				param1: "value 1",
+				param2: "value2"
+			},
 			(result)=>{
 				console.log("ajax onResult")
 				console.log(result)
 			},
 			()=>{
 				console.log("ajax onFail")
+			}
+		)
+	}
+	
+	test_ajax_helper_and_threejs_obj()
+	{
+		Ivane.ThreeJSHelpers.loadOBJFromWeb
+		(
+			"res/model.obj",
+			(object3d)=>{
+				this.scene.add(object3d)
 			}
 		)
 	}
@@ -473,6 +481,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		//this.test_threejsHelpers()
 		this.test_distance_and_revolute_joint_suspension()
 		this.test_ajax_request()
+		this.test_ajax_helper_and_threejs_obj()
 	}
 }
 

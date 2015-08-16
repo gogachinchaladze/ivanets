@@ -46,14 +46,20 @@ module Ivane.Network.Ajax
 		PAGE_NOT_FOUND = 404
 	}
 	
+	export interface AJAXResponse
+	{
+		responseBody:any
+		responseText:string
+	}
+	
 	export interface AJAXRequestSuccessDelegate
 	{
-		(responseData:string):void
+		(response:AJAXResponse):void
 	}
 	
 	export interface AJAXReuqestFailDelegate
 	{
-		():void
+		(event:Event):void
 	}
 	
 	export function createAJAXRequest(
@@ -85,7 +91,7 @@ module Ivane.Network.Ajax
 				{
 					var data_key = data_keys[data_key_index]
 					
-					urlEncodedParameters = data_key
+					urlEncodedParameters += data_key
 											+ "="
 											+ data_nullable[data_key]
 											+ "&"
@@ -96,6 +102,12 @@ module Ivane.Network.Ajax
 			{
 				urlEncodedParameters = data_nullable
 			}
+			
+			urlEncodedParameters = urlEncodedParameters.substr
+			(
+				0,
+				urlEncodedParameters.length - 2
+			)
 			
 			if
 			(
@@ -112,7 +124,7 @@ module Ivane.Network.Ajax
 			ajaxRequest.open
 			(
 				getStringForREQUEST_TYPES(requestType),
-				url+urlEncodedParameters,false
+				url+urlEncodedParameters, true
 			)
 			
 			ajaxRequest.send()
@@ -123,15 +135,37 @@ module Ivane.Network.Ajax
 		}
 		
 		ajaxRequest.onreadystatechange = (ev:ProgressEvent) => {
-				console.log("ajax state: ")
-				console.log(ev)
+			
+			if
+			(
+				ajaxRequest.readyState == AJAX_READY_STATES.REQUEST_FINISHED_AND_RESPOSNE_IS_READY
+				&& ajaxRequest.status == 200
+			)
+			{
+				var ajaxReponse:AJAXResponse = {	
+					responseBody: ajaxRequest.responseBody,
+					responseText: ajaxRequest.responseText
+				}
 				
-				console.log("state name: ")
-				console.log(ajaxRequest.status)
+				onSuccess(ajaxReponse)
+			}
+			else if
+			(
+				ajaxRequest.readyState == AJAX_READY_STATES.REQUEST_FINISHED_AND_RESPOSNE_IS_READY
+				&& ajaxRequest.status != 200
+			)			
+			{
+				onFail(ev)
+			}
+				
+		}
+		
+		ajaxRequest.onerror = (ev:Event)=> {
+			onFail(ev)
 		}
 		
 		
-		return null
+		return ajaxRequest
 	}
 	
 }

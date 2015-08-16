@@ -1,3 +1,100 @@
+var Ivane;
+(function (Ivane) {
+    var Network;
+    (function (Network) {
+        var Ajax;
+        (function (Ajax) {
+            (function (REQUEST_TYPES) {
+                REQUEST_TYPES[REQUEST_TYPES["GET"] = 0] = "GET";
+                REQUEST_TYPES[REQUEST_TYPES["POST"] = 1] = "POST";
+            })(Ajax.REQUEST_TYPES || (Ajax.REQUEST_TYPES = {}));
+            var REQUEST_TYPES = Ajax.REQUEST_TYPES;
+            (function (DATA_TYPES) {
+                DATA_TYPES[DATA_TYPES["SCRIPT"] = 0] = "SCRIPT";
+                DATA_TYPES[DATA_TYPES["JSON"] = 1] = "JSON";
+                DATA_TYPES[DATA_TYPES["XML"] = 2] = "XML";
+                DATA_TYPES[DATA_TYPES["HTML"] = 3] = "HTML";
+                DATA_TYPES[DATA_TYPES["TEXT"] = 4] = "TEXT";
+            })(Ajax.DATA_TYPES || (Ajax.DATA_TYPES = {}));
+            var DATA_TYPES = Ajax.DATA_TYPES;
+            function getStringForREQUEST_TYPES(requestType) {
+                switch (requestType) {
+                    case REQUEST_TYPES.GET:
+                        return "GET";
+                        break;
+                    case REQUEST_TYPES.POST:
+                        return "POST";
+                        break;
+                }
+            }
+            var AJAX_READY_STATES;
+            (function (AJAX_READY_STATES) {
+                AJAX_READY_STATES[AJAX_READY_STATES["REQUEST_NOT_INITIALIZED"] = 0] = "REQUEST_NOT_INITIALIZED";
+                AJAX_READY_STATES[AJAX_READY_STATES["SERVER_CONNECTION_ESTABLISHED"] = 1] = "SERVER_CONNECTION_ESTABLISHED";
+                AJAX_READY_STATES[AJAX_READY_STATES["REQUEST_RECEIVED"] = 2] = "REQUEST_RECEIVED";
+                AJAX_READY_STATES[AJAX_READY_STATES["PROCESSING_REQUEST"] = 3] = "PROCESSING_REQUEST";
+                AJAX_READY_STATES[AJAX_READY_STATES["REQUEST_FINISHED_AND_RESPOSNE_IS_READY"] = 4] = "REQUEST_FINISHED_AND_RESPOSNE_IS_READY";
+            })(AJAX_READY_STATES || (AJAX_READY_STATES = {}));
+            var AJAX_REQUEST_STATUS_CODES;
+            (function (AJAX_REQUEST_STATUS_CODES) {
+                AJAX_REQUEST_STATUS_CODES[AJAX_REQUEST_STATUS_CODES["OK"] = 200] = "OK";
+                AJAX_REQUEST_STATUS_CODES[AJAX_REQUEST_STATUS_CODES["PAGE_NOT_FOUND"] = 404] = "PAGE_NOT_FOUND";
+            })(AJAX_REQUEST_STATUS_CODES || (AJAX_REQUEST_STATUS_CODES = {}));
+            function createAJAXRequest(url, requestType, data_nullable, onSuccess, onFail) {
+                var ajaxRequest = new XMLHttpRequest();
+                var requestTypeString = getStringForREQUEST_TYPES(requestType);
+                var queryString = url;
+                var urlEncodedParameters = "";
+                if (data_nullable != null) {
+                    if (data_nullable instanceof Object) {
+                        var data_keys = Object.keys(data_nullable);
+                        for (var data_key_index = 0; data_key_index < data_keys.length; data_key_index++) {
+                            var data_key = data_keys[data_key_index];
+                            urlEncodedParameters += data_key
+                                + "="
+                                + data_nullable[data_key]
+                                + "&";
+                        }
+                    }
+                    else if (data_nullable instanceof String) {
+                        urlEncodedParameters = data_nullable;
+                    }
+                    urlEncodedParameters = urlEncodedParameters.substr(0, urlEncodedParameters.length - 2);
+                    if (urlEncodedParameters.charAt(0) != "?"
+                        && url.charAt(-1) != "?") {
+                        urlEncodedParameters = "?" + urlEncodedParameters;
+                    }
+                }
+                if (requestType == REQUEST_TYPES.GET) {
+                    ajaxRequest.open(getStringForREQUEST_TYPES(requestType), url + urlEncodedParameters, true);
+                    ajaxRequest.send();
+                }
+                else if (requestType == REQUEST_TYPES.POST) {
+                    throw new Ivane.Exceptions.NotImplemetedException();
+                }
+                ajaxRequest.onreadystatechange = function (ev) {
+                    if (ajaxRequest.readyState == AJAX_READY_STATES.REQUEST_FINISHED_AND_RESPOSNE_IS_READY
+                        && ajaxRequest.status == 200) {
+                        var ajaxReponse = {
+                            responseBody: ajaxRequest.responseBody,
+                            responseText: ajaxRequest.responseText
+                        };
+                        onSuccess(ajaxReponse);
+                    }
+                    else if (ajaxRequest.readyState == AJAX_READY_STATES.REQUEST_FINISHED_AND_RESPOSNE_IS_READY
+                        && ajaxRequest.status != 200) {
+                        onFail(ev);
+                    }
+                };
+                ajaxRequest.onerror = function (ev) {
+                    onFail(ev);
+                };
+                return ajaxRequest;
+            }
+            Ajax.createAJAXRequest = createAJAXRequest;
+        })(Ajax = Network.Ajax || (Network.Ajax = {}));
+    })(Network = Ivane.Network || (Ivane.Network = {}));
+})(Ivane || (Ivane = {}));
 /*
  * Author Ivane Gegia http://ivane.info
  */
@@ -103,36 +200,6 @@ var Ivane;
  */
 var Ivane;
 (function (Ivane) {
-    var Time;
-    (function (Time) {
-        var DeltaTimeComputer = (function () {
-            function DeltaTimeComputer() {
-                this.date = window.performance ? window.performance.now() : new Date().getDate;
-                this.now = 0;
-                this.time = 0;
-                this.dt = 0;
-                this.getDeltaTimeInSeconds = function () {
-                    if (window.performance) {
-                        this.now = window.performance.now();
-                    }
-                    else {
-                        this.now = new Date().getTime();
-                    }
-                    this.dt = this.now - (this.time || this.now);
-                    this.time = this.now;
-                    return this.dt / 1000.0;
-                };
-            }
-            return DeltaTimeComputer;
-        })();
-        Time.DeltaTimeComputer = DeltaTimeComputer;
-    })(Time = Ivane.Time || (Ivane.Time = {}));
-})(Ivane || (Ivane = {}));
-/*
- * Author Ivane Gegia http://ivane.info
- */
-var Ivane;
-(function (Ivane) {
     var Exceptions;
     (function (Exceptions) {
         function MethodNotOverriden() { }
@@ -142,6 +209,23 @@ var Ivane;
         function DynamicAssertionError() { }
         Exceptions.DynamicAssertionError = DynamicAssertionError;
     })(Exceptions = Ivane.Exceptions || (Ivane.Exceptions = {}));
+})(Ivane || (Ivane = {}));
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
+/// <reference path="Exceptions.ts" />
+var Ivane;
+(function (Ivane) {
+    var Assertion;
+    (function (Assertion) {
+        function DynamicAssert(condition, errorMessage) {
+            if (!condition) {
+                console.log(errorMessage);
+                throw new Ivane.Exceptions.DynamicAssertionError();
+            }
+        }
+        Assertion.DynamicAssert = DynamicAssert;
+    })(Assertion = Ivane.Assertion || (Ivane.Assertion = {}));
 })(Ivane || (Ivane = {}));
 /*
  * Author Ivane Gegia http://ivane.info
@@ -371,7 +455,38 @@ var Ivane;
 /*
  * Author Ivane Gegia http://ivane.info
  */
+var Ivane;
+(function (Ivane) {
+    var Time;
+    (function (Time) {
+        var DeltaTimeComputer = (function () {
+            function DeltaTimeComputer() {
+                this.date = window.performance ? window.performance.now() : new Date().getDate;
+                this.now = 0;
+                this.time = 0;
+                this.dt = 0;
+                this.getDeltaTimeInSeconds = function () {
+                    if (window.performance) {
+                        this.now = window.performance.now();
+                    }
+                    else {
+                        this.now = new Date().getTime();
+                    }
+                    this.dt = this.now - (this.time || this.now);
+                    this.time = this.now;
+                    return this.dt / 1000.0;
+                };
+            }
+            return DeltaTimeComputer;
+        })();
+        Time.DeltaTimeComputer = DeltaTimeComputer;
+    })(Time = Ivane.Time || (Ivane.Time = {}));
+})(Ivane || (Ivane = {}));
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 ///<reference path="../definitions/threejs/three.d.ts"/>
+///<reference path="../definitions/threejs/ivane_three.d.ts"/>
 var Ivane;
 (function (Ivane) {
     var ThreeJSHelpers;
@@ -391,8 +506,8 @@ var Ivane;
         }
         ThreeJSHelpers.orthoViewCoordinateToWorld = orthoViewCoordinateToWorld;
         function addGrid(scene) {
-            var verticalGridLineGeometry = new THREE.CubeGeometry(.025, 20, 0);
-            var horizontalGridLineGeometry = new THREE.CubeGeometry(20, .025, 0);
+            var verticalGridLineGeometry = new THREE.CubeGeometry(.025, 20, 0.001);
+            var horizontalGridLineGeometry = new THREE.CubeGeometry(20, .025, 0.001);
             var gridLineMaterial = new THREE.MeshBasicMaterial({
                 color: 0xbcbcbc
             });
@@ -406,21 +521,21 @@ var Ivane;
                 var verticalGridLineMesh = new THREE.Mesh(verticalGridLineGeometry, gridLineMaterial);
                 scene.add(verticalGridLineMesh);
                 if (x == 10) {
-                    verticalGridLineMesh.scale.set(2, 10, 2);
+                    verticalGridLineMesh.scale.set(2, 10, 0.001);
                     verticalGridLineMesh.material = greenLineMaterial;
                 }
-                verticalGridLineMesh.scale.set(2, 10, 2);
+                verticalGridLineMesh.scale.set(2, 10, 0.001);
                 verticalGridLineMesh.position.set(-10 + x, 0, 0);
             }
             for (var y = 0; y < 20; y++) {
                 var horizontalGridLineMesh = new THREE.Mesh(horizontalGridLineGeometry, gridLineMaterial);
                 scene.add(horizontalGridLineMesh);
                 if (y == 10) {
-                    horizontalGridLineMesh.scale.set(1, 2, 2);
+                    horizontalGridLineMesh.scale.set(1, 2, 0.001);
                     horizontalGridLineMesh.material = redLineMaterial;
                 }
-                horizontalGridLineMesh.scale.set(1, 2, 2);
-                horizontalGridLineMesh.position.set(0, -10 + y, 0);
+                horizontalGridLineMesh.scale.set(1, 2, 0.001);
+                horizontalGridLineMesh.position.set(0, -10 + y, -0.1);
             }
         }
         ThreeJSHelpers.addGrid = addGrid;
@@ -462,6 +577,26 @@ var Ivane;
             return rectangleMesh;
         }
         ThreeJSHelpers.createRectangleMesh = createRectangleMesh;
+        function loadOBJFromWeb(url, onComplete, onProgress, onFail) {
+            var loadManager = new THREE.LoadingManager();
+            var objLoader = new THREE.OBJLoader(loadManager);
+            objLoader.load(url, _onComplete, _onProgress, _onFail);
+            function _onComplete(object) {
+                onComplete(object);
+            }
+            function _onProgress(xhr) {
+                if (xhr.lengthComputable
+                    && (onProgress !== undefined && onProgress != null)) {
+                    onProgress(xhr);
+                }
+            }
+            function _onFail(xhr) {
+                if (onFail !== undefined) {
+                    onFail();
+                }
+            }
+        }
+        ThreeJSHelpers.loadOBJFromWeb = loadOBJFromWeb;
     })(ThreeJSHelpers = Ivane.ThreeJSHelpers || (Ivane.ThreeJSHelpers = {}));
 })(Ivane || (Ivane = {}));
 /*
@@ -569,19 +704,47 @@ var mc = (function (_super) {
 /*
  * Author Ivane Gegia http://ivane.info
  */
-/// <reference path="Exceptions.ts" />
+/// <reference path="GameClassThreeJS.ts" />
 var Ivane;
 (function (Ivane) {
-    var Assertion;
-    (function (Assertion) {
-        function DynamicAssert(condition, errorMessage) {
-            if (!condition) {
-                console.log(errorMessage);
-                throw new Ivane.Exceptions.DynamicAssertionError();
+    var ThreeJSHelpers;
+    (function (ThreeJSHelpers) {
+        var EditorGridGameClassThreeJS = (function (_super) {
+            __extends(EditorGridGameClassThreeJS, _super);
+            function EditorGridGameClassThreeJS() {
+                _super.call(this);
             }
-        }
-        Assertion.DynamicAssert = DynamicAssert;
-    })(Assertion = Ivane.Assertion || (Ivane.Assertion = {}));
+            return EditorGridGameClassThreeJS;
+        })(ThreeJSHelpers.GameClassThreeJS);
+        ThreeJSHelpers.EditorGridGameClassThreeJS = EditorGridGameClassThreeJS;
+    })(ThreeJSHelpers = Ivane.ThreeJSHelpers || (Ivane.ThreeJSHelpers = {}));
+})(Ivane || (Ivane = {}));
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
+var Ivane;
+(function (Ivane) {
+    var Utils;
+    (function (Utils) {
+        var FireOnce = (function () {
+            function FireOnce(callback) {
+                this.callbackCalled = false;
+                this.callback = null;
+                this.callback = callback;
+            }
+            FireOnce.prototype.fire = function () {
+                if (this.callbackCalled === false && this.callback != null) {
+                    this.callback();
+                    this.callbackCalled = true;
+                }
+            };
+            FireOnce.prototype.reset = function () {
+                this.callbackCalled = false;
+            };
+            return FireOnce;
+        })();
+        Utils.FireOnce = FireOnce;
+    })(Utils = Ivane.Utils || (Ivane.Utils = {}));
 })(Ivane || (Ivane = {}));
 /*
  * Author Ivane Gegia http://ivane.info
@@ -688,11 +851,20 @@ var Ivane;
         LiquidFunHelpers.createStaticBody = createStaticBody;
     })(LiquidFunHelpers = Ivane.LiquidFunHelpers || (Ivane.LiquidFunHelpers = {}));
 })(Ivane || (Ivane = {}));
-///<reference path="../src/AnimationsManager.ts"/>
-///<reference path="../src/DeltaTime.ts" />
-///<reference path="../src/GameClassThreeJS.ts"/>
-///<reference path="../src/ThreeJSHelpers.ts"/>
-///<reference path="../src/LiquidFunHelpers.ts" />
+/// <dependency path="jslib/liquidfun/liquidfun.js" />
+/// <dependency path="jslib/threejs/{thre.js|three.min.js}" />
+/// <reference path="src/AjaxHelpers.ts" />
+/// <reference path="src/AnimationsManager.ts" />
+/// <reference path="src/Assertion.ts" />
+/// <reference path="src/CanvasInputsManager.ts" />
+/// <reference path="src/DeltaTime.ts" />
+/// <reference path="src/EditorGridGameClassThreeJS.ts" />
+/// <reference path="src/Exceptions.ts" />
+/// <reference path="src/FireOnce.ts" />
+/// <reference path="src/GameClassThreeJS.ts" />
+/// <reference path="src/LiquidFunHelpers.ts" />
+/// <reference path="src/ThreeJSHelpers.ts" />
+/// <reference path="../Ivane_Main.ts" />
 var animationsManager = new Ivane.Animation.AnimationsManager(32);
 animationsManager.queueAnimation(1, 100, 2, Ivane.Animation.EASING_TYPES.EASE_IN_EASE_OUT, function (animation) {
     console.log(animation.getProgress());
@@ -902,11 +1074,31 @@ var GClass = (function (_super) {
         };
         this.subStepFunctions.push(renderDistanceJointSuspension);
     };
+    GClass.prototype.test_ajax_request = function () {
+        var AJAX = Ivane.Network.Ajax;
+        AJAX.createAJAXRequest("/tests/download_test.txt", AJAX.REQUEST_TYPES.GET, {
+            param1: "value 1",
+            param2: "value2"
+        }, function (result) {
+            console.log("ajax onResult");
+            console.log(result);
+        }, function () {
+            console.log("ajax onFail");
+        });
+    };
+    GClass.prototype.test_ajax_helper_and_threejs_obj = function () {
+        var _this = this;
+        Ivane.ThreeJSHelpers.loadOBJFromWeb("res/model.obj", function (object3d) {
+            _this.scene.add(object3d);
+        });
+    };
     GClass.prototype.runtTests = function () {
         this.test_mergeGeometry();
         this.test_liquidfun();
         //this.test_threejsHelpers()
         this.test_distance_and_revolute_joint_suspension();
+        this.test_ajax_request();
+        this.test_ajax_helper_and_threejs_obj();
     };
     return GClass;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
