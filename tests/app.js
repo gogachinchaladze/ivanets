@@ -1,9 +1,5 @@
-/*!
- *
- *  (c) 2015, Ivane Gegia
- *  http://ivane.info
- *
- *  MIT License
+/*
+ * Author Ivane Gegia http://ivane.info
  */
 var Ivane;
 (function (Ivane) {
@@ -102,12 +98,8 @@ var Ivane;
         Animation_1.AnimationsManager = AnimationsManager;
     })(Animation = Ivane.Animation || (Ivane.Animation = {}));
 })(Ivane || (Ivane = {}));
-/*!
- *
- *  (c) 2015, Ivane Gegia
- *  http://ivane.info
- *
- *  MIT License
+/*
+ * Author Ivane Gegia http://ivane.info
  */
 var Ivane;
 (function (Ivane) {
@@ -136,6 +128,9 @@ var Ivane;
         Time.DeltaTimeComputer = DeltaTimeComputer;
     })(Time = Ivane.Time || (Ivane.Time = {}));
 })(Ivane || (Ivane = {}));
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 var Ivane;
 (function (Ivane) {
     var Exceptions;
@@ -148,6 +143,9 @@ var Ivane;
         Exceptions.DynamicAssertionError = DynamicAssertionError;
     })(Exceptions = Ivane.Exceptions || (Ivane.Exceptions = {}));
 })(Ivane || (Ivane = {}));
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 ///<reference path="../definitions/threejs/three.d.ts"/>
 ///<reference path="Exceptions.ts"/>
 var Ivane;
@@ -370,6 +368,9 @@ var Ivane;
         var KeyCodes = Inputs.KeyCodes;
     })(Inputs = Ivane.Inputs || (Ivane.Inputs = {}));
 })(Ivane || (Ivane = {}));
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 ///<reference path="../definitions/threejs/three.d.ts"/>
 var Ivane;
 (function (Ivane) {
@@ -463,16 +464,19 @@ var Ivane;
         ThreeJSHelpers.createRectangleMesh = createRectangleMesh;
     })(ThreeJSHelpers = Ivane.ThreeJSHelpers || (Ivane.ThreeJSHelpers = {}));
 })(Ivane || (Ivane = {}));
-///<reference path="../definitions/threejs/three.d.ts" />
-///<reference path="DeltaTime.ts"/>
-///<reference path="CanvasInputsManager.ts"/>
-///<reference path="ThreeJSHelpers.ts"/>
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+///<reference path="../definitions/threejs/three.d.ts" />
+///<reference path="DeltaTime.ts"/>
+///<reference path="CanvasInputsManager.ts"/>
+///<reference path="ThreeJSHelpers.ts"/>
 var Ivane;
 (function (Ivane) {
     var ThreeJSHelpers;
@@ -562,6 +566,9 @@ var mc = (function (_super) {
     };
     return mc;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 /// <reference path="Exceptions.ts" />
 var Ivane;
 (function (Ivane) {
@@ -576,6 +583,9 @@ var Ivane;
         Assertion.DynamicAssert = DynamicAssert;
     })(Assertion = Ivane.Assertion || (Ivane.Assertion = {}));
 })(Ivane || (Ivane = {}));
+/*
+ * Author Ivane Gegia http://ivane.info
+ */
 /// <reference path="../definitions/liquidfun/liquidfun.d.ts" />
 /// <reference path="Exceptions.ts" />
 /// <reference path="Assertion.ts" />
@@ -783,7 +793,7 @@ var GClass = (function (_super) {
         // 	1, null)
         //Testing kinematic body creation
         var boxShape = new b2PolygonShape();
-        boxShape.SetAsBoxXY(40, 1);
+        boxShape.SetAsBoxXY(500, 1);
         var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(this.lfWorld, boxShape, 1, new b2Vec2(-5, -2), 1, 1, true, false, 0, null);
         //Testing static body creation function
         boxShape.SetAsBoxXY(5, 1);
@@ -888,6 +898,7 @@ var GClass = (function (_super) {
                 + "\n y: " + localPoint.y
                 + "\n testPoint: " + testPoint
                 + "</pre>";
+            _this.mainOrthoCamera.position.x = carBodyBody.GetPosition().x;
         };
         this.subStepFunctions.push(renderDistanceJointSuspension);
     };

@@ -3,6 +3,8 @@
 ///<reference path="../src/GameClassThreeJS.ts"/>
 ///<reference path="../src/ThreeJSHelpers.ts"/>
 ///<reference path="../src/LiquidFunHelpers.ts" />
+/// <reference path="../src/AjaxHelpers.ts" />
+
 
 var animationsManager = new Ivane.Animation.AnimationsManager(32)
 
@@ -183,7 +185,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			
 		//Testing kinematic body creation
 		var boxShape = new b2PolygonShape()
-		boxShape.SetAsBoxXY(40,1)
+		boxShape.SetAsBoxXY(500,1)
 		
 		var kinematicBody = Ivane.LiquidFunHelpers.createKinematicBody(
 			this.lfWorld,
@@ -438,9 +440,30 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 			+ "\n y: " + localPoint.y
 			+ "\n testPoint: " + testPoint
 			+ "</pre>"
+			
+			this.mainOrthoCamera.position.x = carBodyBody.GetPosition().x
 		}
 		
 		this.subStepFunctions.push(renderDistanceJointSuspension)
+	}
+	
+	test_ajax_request()
+	{
+		var AJAX = Ivane.Network.Ajax
+		
+		AJAX.createAJAXRequest
+		(
+			"/test/download_test.txt",
+			AJAX.REQUEST_TYPES.GET,
+			null,
+			(result)=>{
+				console.log("ajax onResult")
+				console.log(result)
+			},
+			()=>{
+				console.log("ajax onFail")
+			}
+		)
 	}
 	
 	runtTests()
@@ -449,6 +472,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		this.test_liquidfun()
 		//this.test_threejsHelpers()
 		this.test_distance_and_revolute_joint_suspension()
+		this.test_ajax_request()
 	}
 }
 

@@ -61,7 +61,16 @@ module Ivane.Animation {
 
                 }
 
-                public reset(from: number, to: number, durationInSeconds: number, easingType: EASING_TYPES, animationStepDelegate: AnimationStepDelegate, animationFinishedDelegate: AnimationStepDelegate): void {
+                public reset
+                (
+                        from: number, 
+                        to: number, 
+                        durationInSeconds: number, 
+                        easingType: EASING_TYPES, 
+                        animationStepDelegate: AnimationStepDelegate, 
+                        animationFinishedDelegate: AnimationStepDelegate
+                ): void 
+                {
                         this.from = from;
                         this.to = to;
                         this.durationInSeconds = durationInSeconds;
@@ -84,7 +93,16 @@ module Ivane.Animation {
                         }
                 }
 
-                public queueAnimation(from: number, to: number, durationInSeconds: number, easingType: EASING_TYPES, animationStepHandler: AnimationStepDelegate, animationFinishedHandler: AnimationStepDelegate): void {
+                public queueAnimation
+                (
+                        from: number, 
+                        to: number, 
+                        durationInSeconds: number, 
+                        easingType: EASING_TYPES, 
+                        animationStepHandler: AnimationStepDelegate, 
+                        animationFinishedHandler: AnimationStepDelegate
+                ): void 
+                {
                         var animation = this.tryToGetInactiveAnimation();
 
                         animation.reset(from, to, durationInSeconds, easingType, animationStepHandler, animationFinishedHandler);
