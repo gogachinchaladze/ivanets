@@ -1050,7 +1050,7 @@ var GClass = (function (_super) {
                     var physicsBodyRotation = physicsBody.GetAngle();
                     bodyMesh.position.set(physicsBodyPosition.x, physicsBodyPosition.y, 0);
                     bodyMesh.rotation.z = physicsBodyRotation;
-                    var TORQUE_AMMOUNT = 8;
+                    var TORQUE_AMMOUNT = 8.1;
                     if (_this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.left_arrow)) {
                         carLeftWheelBody.ApplyTorque(TORQUE_AMMOUNT, true);
                         carRightWheelBody.ApplyTorque(TORQUE_AMMOUNT, true);

@@ -2,15 +2,18 @@
 
 var animationsManager = new Ivane.Animation.AnimationsManager(32)
 
-animationsManager.queueAnimation(1,100,2,
+animationsManager.queueAnimation
+(
+	1,100,2,
 	Ivane.Animation.EASING_TYPES.EASE_IN_EASE_OUT,
-	(animation)=>{
+	(animation) => {
 		console.log(animation.getProgress())
 	},
-	(animation)=>{
+	(animation) => {
 		console.log(animation.getProgress())
 		console.log("animation finished")
-	})
+	}
+)
 	
 
 var dt:number = 0.0	
@@ -405,7 +408,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 					
 					bodyMesh.rotation.z = physicsBodyRotation
 					
-					const TORQUE_AMMOUNT = 8
+					const TORQUE_AMMOUNT = 8.1
 					
 					if(this.inputsManager.keyIsDown(Ivane.Inputs.KeyCodes.left_arrow))
 					{
