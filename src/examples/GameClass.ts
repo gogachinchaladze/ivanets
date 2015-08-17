@@ -28,3 +28,10 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS {
 	gameStep() {
 	}
 }
+
+
+window.onload = () => {
+	var gClass = new GClass()
+	
+	gClass.run()
+}
