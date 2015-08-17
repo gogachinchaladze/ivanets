@@ -1,7 +1,6 @@
 /// <reference path="../../Ivane_Main.ts" />
 
 class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS {
-	logDiv: HTMLDivElement
 
 	constructor() {
 		super()
@@ -26,6 +25,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS {
 
 
 	gameStep() {
+		console.log(this.deltaTime)
 	}
 }
 
