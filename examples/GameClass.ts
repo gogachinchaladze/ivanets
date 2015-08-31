@@ -1,4 +1,4 @@
-/// <reference path="../../Ivane_Main.ts" />
+/// <reference path="../Ivane_Main.ts" />
 
 class GameClass extends Ivane.ThreeJSHelpers.GameClassThreeJS {
 
