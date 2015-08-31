@@ -1,3 +1,6 @@
+/*
+External sample from: http://stackoverflow.com/questions/15561871/the-fastest-way-to-batch-calls-in-webgl
+*/
 var MAX_QUADS_PER_BATCH = 100;
 var VERTS_PER_QUAD = 6;
 var FLOATS_PER_VERT = 2;
