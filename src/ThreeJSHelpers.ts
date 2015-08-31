@@ -7,6 +7,19 @@
 
 module Ivane.ThreeJSHelpers {
 
+	export function setUVsForRectangleMesh(rectangleMesh_in_out:THREE.Mesh,
+		topLeftU:number, topLeftV:number,
+		topRightU:number, topRightV:number,
+		bottomRightU:number, bottomRightV:number,
+		bottomLeftU:number, bottomLeftV:number)
+	{
+		setUVsForRectangleGeometry(rectangleMesh_in_out.geometry,
+									topLeftU, topLeftV,
+									topRightU, topRightV,
+									bottomRightU, bottomRightV,
+									bottomLeftU, bottomLeftV)	
+	}
+
 	export function setUVsForRectangleGeometry(rectangleGeometry_in_out:THREE.Geometry,
 		topLeftU:number, topLeftV:number,
 		topRightU:number, topRightV:number,
