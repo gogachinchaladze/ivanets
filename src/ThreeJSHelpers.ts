@@ -7,6 +7,23 @@
 
 module Ivane.ThreeJSHelpers {
 
+	export function setUVsForRectangleGeometry(rectangleGeometry_in_out:THREE.Geometry,
+		topLeftU:number, topLeftV:number,
+		topRightU:number, topRightV:number,
+		bottomRightU:number, bottomRightV:number,
+		bottomLeftU:number, bottomLeftV:number)
+	{
+		rectangleGeometry_in_out.faceVertexUvs[0][0][0].set(bottomRightU, bottomRightV)
+		rectangleGeometry_in_out.faceVertexUvs[0][0][1].set(topRightU, topRightV)
+		rectangleGeometry_in_out.faceVertexUvs[0][0][2].set(topLeftU, topLeftV)
+		
+		rectangleGeometry_in_out.faceVertexUvs[0][1][0].set(bottomRightU, bottomRightV)
+		rectangleGeometry_in_out.faceVertexUvs[0][1][1].set(topLeftU, topLeftV)
+		rectangleGeometry_in_out.faceVertexUvs[0][1][2].set(bottomLeftU, bottomLeftV)
+		
+		rectangleGeometry_in_out.uvsNeedUpdate = true
+	}
+
 	export function getOrtho2DCoordinatesFromPixelCoordinates
 	(
 		viewWidthInPixels: number,
