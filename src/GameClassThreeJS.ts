@@ -11,7 +11,7 @@ module Ivane.ThreeJSHelpers
 {
 	export interface OrthoCameraSettings
 	{
-		heigh:number
+		height:number
 		near:number //1 default
 		far:number //1000 default
 	}
@@ -56,10 +56,10 @@ module Ivane.ThreeJSHelpers
 			
 			var viewRatio = rendererSettings.viewWidth / rendererSettings.viewHeight
 			
-			this.mainOrthoCamera = new THREE.OrthographicCamera(-cameraSettings.heigh * viewRatio,
-				cameraSettings.heigh * viewRatio,
-				cameraSettings.heigh,
-				-cameraSettings.heigh,
+			this.mainOrthoCamera = new THREE.OrthographicCamera(-cameraSettings.height * viewRatio,
+				cameraSettings.height * viewRatio,
+				cameraSettings.height,
+				-cameraSettings.height,
 				cameraSettings.near,
 				cameraSettings.far)
 			this.scene.add(this.mainOrthoCamera)

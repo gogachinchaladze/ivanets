@@ -176,6 +176,7 @@ module Ivane.Inputs
 	export enum KeyCodes
 	{
 		backspace = 8,
+		space = 32,
 		tab = 9,
 		enter = 13,
 		shift = 16,
