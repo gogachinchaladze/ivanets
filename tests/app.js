@@ -604,7 +604,7 @@ var Ivane;
 /*
  * Author Ivane Gegia http://ivane.info
  */
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -853,6 +853,123 @@ var Ivane;
         LiquidFunHelpers.createStaticBody = createStaticBody;
     })(LiquidFunHelpers = Ivane.LiquidFunHelpers || (Ivane.LiquidFunHelpers = {}));
 })(Ivane || (Ivane = {}));
+/// <reference path="DeltaTime.ts" />
+var Ivane;
+(function (Ivane) {
+    var DOMHelpers;
+    (function (DOMHelpers) {
+        (function (POSITION_MODES) {
+            POSITION_MODES[POSITION_MODES["RELATIVE"] = 0] = "RELATIVE";
+            POSITION_MODES[POSITION_MODES["ABSOLUTE"] = 1] = "ABSOLUTE";
+            POSITION_MODES[POSITION_MODES["FIXED"] = 2] = "FIXED";
+        })(DOMHelpers.POSITION_MODES || (DOMHelpers.POSITION_MODES = {}));
+        var POSITION_MODES = DOMHelpers.POSITION_MODES;
+        function convertPositionModeToString(positionMode) {
+            var positionModeString = "";
+            switch (positionMode) {
+                case POSITION_MODES.ABSOLUTE:
+                    positionModeString = "absolute";
+                    break;
+                case POSITION_MODES.FIXED:
+                    positionModeString = "fixed";
+                    break;
+                case POSITION_MODES.RELATIVE:
+                    positionModeString = "relative";
+                    break;
+            }
+            return positionModeString;
+        }
+        (function (DISPLAY_MODES) {
+            DISPLAY_MODES[DISPLAY_MODES["BLOCK"] = 0] = "BLOCK";
+            DISPLAY_MODES[DISPLAY_MODES["INLINE"] = 1] = "INLINE";
+            DISPLAY_MODES[DISPLAY_MODES["NONE"] = 2] = "NONE";
+        })(DOMHelpers.DISPLAY_MODES || (DOMHelpers.DISPLAY_MODES = {}));
+        var DISPLAY_MODES = DOMHelpers.DISPLAY_MODES;
+        function covertDisplayModeToString(displayMode) {
+            var displayModeString = "";
+            switch (displayMode) {
+                case DISPLAY_MODES.BLOCK:
+                    displayModeString = "block";
+                    break;
+                case DISPLAY_MODES.INLINE:
+                    displayModeString = "inline";
+                    break;
+                case DISPLAY_MODES.NONE:
+                    displayModeString = "none";
+                    break;
+            }
+            return displayModeString;
+        }
+        var EXTHTMLElement = (function () {
+            function EXTHTMLElement() {
+            }
+            EXTHTMLElement.createEXTDiv = function () {
+                var div = document.createElement("div");
+                var extHTMLElement = new EXTHTMLElement();
+                extHTMLElement.domElement = div;
+                return extHTMLElement;
+            };
+            EXTHTMLElement.prototype.getDOMElement = function () {
+                return this.domElement;
+            };
+            EXTHTMLElement.prototype.setDisplayMode = function (displayMode) {
+                this.domElement.style.display = covertDisplayModeToString(displayMode);
+                return this;
+            };
+            EXTHTMLElement.prototype.setPositionMode = function (positionMode) {
+                this.domElement.style.position = convertPositionModeToString(positionMode);
+                return this;
+            };
+            EXTHTMLElement.prototype.setLeftInPixels = function (pixels) {
+                this.domElement.style.left = pixels + "px";
+                return this;
+            };
+            EXTHTMLElement.prototype.setTopInPixels = function (pixels) {
+                this.domElement.style.top = pixels + "px";
+                return this;
+            };
+            EXTHTMLElement.prototype.setRightInPixels = function (pixels) {
+                this.domElement.style.right = pixels + "px";
+                return this;
+            };
+            EXTHTMLElement.prototype.setBottomInPixels = function (pixels) {
+                this.domElement.style.bottom = pixels + "px";
+                return this;
+            };
+            EXTHTMLElement.prototype.setBackgroundColor = function (color) {
+                this.domElement.style.backgroundColor = "#" + color.toString(16);
+                return this;
+            };
+            EXTHTMLElement.prototype.getBackgroundColor = function () {
+                return parseInt(this.domElement.style.backgroundColor.replace("#", ""), 16);
+            };
+            EXTHTMLElement.prototype.setWidthInPixels = function (width) {
+                this.domElement.style.width = width + "px";
+                return this;
+            };
+            EXTHTMLElement.prototype.getWidth = function () {
+                return parseInt(this.domElement.style.width);
+            };
+            EXTHTMLElement.prototype.setHeightInPixels = function (height) {
+                this.domElement.style.height = height + "px";
+                return this;
+            };
+            EXTHTMLElement.prototype.getHeight = function () {
+                return parseInt(this.domElement.style.height);
+            };
+            EXTHTMLElement.prototype.setZRotaion = function (rotationDegrees) {
+                this.domElement.style.transform = "rotate(" + rotationDegrees + "deg)";
+                return this;
+            };
+            EXTHTMLElement.prototype.setZIndex = function (zIndex) {
+                this.domElement.style.zIndex = zIndex.toString();
+                return this;
+            };
+            return EXTHTMLElement;
+        })();
+        DOMHelpers.EXTHTMLElement = EXTHTMLElement;
+    })(DOMHelpers = Ivane.DOMHelpers || (Ivane.DOMHelpers = {}));
+})(Ivane || (Ivane = {}));
 /// <dependency path="jslib/liquidfun/liquidfun.js" />
 /// <dependency path="jslib/threejs/{thre.js|three.min.js}" />
 /// <reference path="src/AjaxHelpers.ts" />
@@ -866,6 +983,7 @@ var Ivane;
 /// <reference path="src/GameClassThreeJS.ts" />
 /// <reference path="src/LiquidFunHelpers.ts" />
 /// <reference path="src/ThreeJSHelpers.ts" />
+/// <reference path="src/EXTHTMLElement.ts" />
 /// <reference path="../Ivane_Main.ts" />
 var animationsManager = new Ivane.Animation.AnimationsManager(32);
 animationsManager.queueAnimation(1, 100, 2, Ivane.Animation.EASING_TYPES.EASE_IN_EASE_OUT, function (animation) {
@@ -1104,6 +1222,19 @@ var GClass = (function (_super) {
             _this.scene.add(object3d);
         });
     };
+    GClass.prototype.test_exthtmlelement = function () {
+        var extDiv = Ivane.DOMHelpers.EXTHTMLElement.createEXTDiv();
+        document.body.appendChild(extDiv.getDOMElement());
+        extDiv.setDisplayMode(Ivane.DOMHelpers.DISPLAY_MODES.BLOCK);
+        extDiv.setZIndex(100)
+            .setWidthInPixels(100)
+            .setHeightInPixels(100)
+            .setBackgroundColor(0xff0000)
+            .setLeftInPixels(30)
+            .setTopInPixels(30)
+            .setPositionMode(Ivane.DOMHelpers.POSITION_MODES.ABSOLUTE)
+            .setZRotaion(30);
+    };
     GClass.prototype.runtTests = function () {
         this.test_mergeGeometry();
         this.test_liquidfun();
@@ -1111,6 +1242,7 @@ var GClass = (function (_super) {
         this.test_distance_and_revolute_joint_suspension();
         this.test_ajax_request();
         //this.test_ajax_helper_and_threejs_obj()
+        this.test_exthtmlelement();
     };
     return GClass;
 })(Ivane.ThreeJSHelpers.GameClassThreeJS);

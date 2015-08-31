@@ -12,5 +12,6 @@
 /// <reference path="src/GameClassThreeJS.ts" />
 /// <reference path="src/LiquidFunHelpers.ts" />
 /// <reference path="src/ThreeJSHelpers.ts" />
+/// <reference path="src/EXTHTMLElement.ts" />
 
 

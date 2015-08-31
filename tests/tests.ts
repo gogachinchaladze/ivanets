@@ -14,7 +14,6 @@ animationsManager.queueAnimation
 		console.log("animation finished")
 	}
 )
-	
 
 var dt:number = 0.0	
 //var world:b2World
@@ -498,6 +497,24 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		)
 	}
 	
+	test_exthtmlelement()
+	{
+		var extDiv = Ivane.DOMHelpers.EXTHTMLElement.createEXTDiv()
+		
+		document.body.appendChild(extDiv.getDOMElement())
+		
+		extDiv.setDisplayMode(Ivane.DOMHelpers.DISPLAY_MODES.BLOCK)
+		extDiv.setZIndex(100)
+		.setWidthInPixels(100)
+		.setHeightInPixels(100)
+		.setBackgroundColor(0xff0000)
+		.setLeftInPixels(30)
+		.setTopInPixels(30)
+		.setPositionMode(Ivane.DOMHelpers.POSITION_MODES.ABSOLUTE)
+		.setZRotaion(30)
+		
+	}
+	
 	runtTests()
 	{
 		this.test_mergeGeometry()
@@ -506,6 +523,8 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		this.test_distance_and_revolute_joint_suspension()
 		this.test_ajax_request()
 		//this.test_ajax_helper_and_threejs_obj()
+		
+		this.test_exthtmlelement()
 	}
 }
 

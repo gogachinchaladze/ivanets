@@ -1,6 +1,6 @@
 /// <reference path="../../Ivane_Main.ts" />
 
-class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS {
+class GameClass extends Ivane.ThreeJSHelpers.GameClassThreeJS {
 
 	constructor() {
 		super()
@@ -31,7 +31,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS {
 
 
 window.onload = () => {
-	var gClass = new GClass()
+	var gClass = new GameClass()
 	
 	gClass.run()
 }

@@ -1,5 +1,5 @@
 /*
- * Author Ivane Gegia http://ivane.info
+ * Definitions author Ivane Gegia http://ivane.info
  */
 
 declare class b2Vec2
