@@ -7,6 +7,25 @@
 
 module Ivane.ThreeJSHelpers {
 
+	export function getSpriteSheetFrame(numberOfFramesOnU:number,numberOfFramesOnV:number,frameIndex:number){
+		var coordinatesArr = [];
+		
+		var uStep = 1/numberOfFramesOnU;
+		var vStep = 1/numberOfFramesOnV;
+		for(var i = 0,length=numberOfFramesOnV;i<length;i++){
+			for(var j = 0,length2=numberOfFramesOnU;j<length2;j++){
+				var pointsObj = {
+					topLeft : {u:j*uStep, v: 1- i*vStep},
+					topRight : {u:j*uStep + uStep, v: 1- i*vStep},
+					bottomRight : {u:j*uStep + uStep, v: 1- i*vStep - vStep },
+					bottomLeft : {u:j*uStep, v: 1- i*vStep - vStep }
+				}
+				coordinatesArr[i*length2 +j] = pointsObj;
+			}
+		}
+		return coordinatesArr;
+	}
+ 
 	export function setUVsForRectangleMesh(rectangleMesh_in_out:THREE.Mesh,
 		topLeftU:number, topLeftV:number,
 		topRightU:number, topRightV:number,

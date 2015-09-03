@@ -35,7 +35,7 @@ class GClass extends Ivane.ThreeJSHelpers.GameClassThreeJS
 		
 		this.initWithOrthoCamera(
 			{
-			heigh:10,
+			height:10,
 			near:1,
 			far:100
 		},

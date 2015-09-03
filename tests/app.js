@@ -353,6 +353,7 @@ var Ivane;
         Inputs.CanvasInputsManager = CanvasInputsManager;
         (function (KeyCodes) {
             KeyCodes[KeyCodes["backspace"] = 8] = "backspace";
+            KeyCodes[KeyCodes["space"] = 32] = "space";
             KeyCodes[KeyCodes["tab"] = 9] = "tab";
             KeyCodes[KeyCodes["enter"] = 13] = "enter";
             KeyCodes[KeyCodes["shift"] = 16] = "shift";
@@ -493,6 +494,38 @@ var Ivane;
 (function (Ivane) {
     var ThreeJSHelpers;
     (function (ThreeJSHelpers) {
+        function getSpriteSheetFrame(numberOfFramesOnU, numberOfFramesOnV, frameIndex) {
+            var coordinatesArr = [];
+            var uStep = 1 / numberOfFramesOnU;
+            var vStep = 1 / numberOfFramesOnV;
+            for (var i = 0, length = numberOfFramesOnV; i < length; i++) {
+                for (var j = 0, length2 = numberOfFramesOnU; j < length2; j++) {
+                    var pointsObj = {
+                        topLeft: { u: j * uStep, v: 1 - i * vStep },
+                        topRight: { u: j * uStep + uStep, v: 1 - i * vStep },
+                        bottomRight: { u: j * uStep + uStep, v: 1 - i * vStep - vStep },
+                        bottomLeft: { u: j * uStep, v: 1 - i * vStep - vStep }
+                    };
+                    coordinatesArr[i * length2 + j] = pointsObj;
+                }
+            }
+            return coordinatesArr;
+        }
+        ThreeJSHelpers.getSpriteSheetFrame = getSpriteSheetFrame;
+        function setUVsForRectangleMesh(rectangleMesh_in_out, topLeftU, topLeftV, topRightU, topRightV, bottomRightU, bottomRightV, bottomLeftU, bottomLeftV) {
+            setUVsForRectangleGeometry(rectangleMesh_in_out.geometry, topLeftU, topLeftV, topRightU, topRightV, bottomRightU, bottomRightV, bottomLeftU, bottomLeftV);
+        }
+        ThreeJSHelpers.setUVsForRectangleMesh = setUVsForRectangleMesh;
+        function setUVsForRectangleGeometry(rectangleGeometry_in_out, topLeftU, topLeftV, topRightU, topRightV, bottomRightU, bottomRightV, bottomLeftU, bottomLeftV) {
+            rectangleGeometry_in_out.faceVertexUvs[0][0][0].set(bottomRightU, bottomRightV);
+            rectangleGeometry_in_out.faceVertexUvs[0][0][1].set(topRightU, topRightV);
+            rectangleGeometry_in_out.faceVertexUvs[0][0][2].set(topLeftU, topLeftV);
+            rectangleGeometry_in_out.faceVertexUvs[0][1][0].set(bottomRightU, bottomRightV);
+            rectangleGeometry_in_out.faceVertexUvs[0][1][1].set(topLeftU, topLeftV);
+            rectangleGeometry_in_out.faceVertexUvs[0][1][2].set(bottomLeftU, bottomLeftV);
+            rectangleGeometry_in_out.uvsNeedUpdate = true;
+        }
+        ThreeJSHelpers.setUVsForRectangleGeometry = setUVsForRectangleGeometry;
         function getOrtho2DCoordinatesFromPixelCoordinates(viewWidthInPixels, viewHeightInPixels, pointerTopLeftXInPixels, pointerTopLeftYInPixels, orthoCamera, ortho2DCoordiantes__out) {
             var orthoRangeOfX = -orthoCamera.left + orthoCamera.right;
             var orthoRangeOfY = -orthoCamera.bottom + orthoCamera.top;
@@ -635,7 +668,7 @@ var Ivane;
             GameClassThreeJS.prototype.initWithOrthoCamera = function (cameraSettings, rendererSettings, rendererContainer) {
                 this.scene = new THREE.Scene();
                 var viewRatio = rendererSettings.viewWidth / rendererSettings.viewHeight;
-                this.mainOrthoCamera = new THREE.OrthographicCamera(-cameraSettings.heigh * viewRatio, cameraSettings.heigh * viewRatio, cameraSettings.heigh, -cameraSettings.heigh, cameraSettings.near, cameraSettings.far);
+                this.mainOrthoCamera = new THREE.OrthographicCamera(-cameraSettings.height * viewRatio, cameraSettings.height * viewRatio, cameraSettings.height, -cameraSettings.height, cameraSettings.near, cameraSettings.far);
                 this.scene.add(this.mainOrthoCamera);
                 this.mainOrthoCamera.position.set(0, 0, 10);
                 this.renderer = new THREE.WebGLRenderer();
@@ -1004,7 +1037,7 @@ var GClass = (function (_super) {
         this.subStepFunctions = new Array();
         this.logDiv = document.getElementById("log");
         this.initWithOrthoCamera({
-            heigh: 10,
+            height: 10,
             near: 1,
             far: 100
         }, {
